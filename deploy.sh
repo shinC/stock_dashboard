@@ -29,11 +29,13 @@ fi
 
 echo "[3/5] Python 가상환경 구성 및 패키지 설치"
 cd $REPO_DIR
-if [ ! -d "venv" ]; then
-    sudo -u $APP_USER python3 -m venv venv
-fi
-sudo -u $APP_USER ./venv/bin/pip install --upgrade pip
-sudo -u $APP_USER ./venv/bin/pip install -r requirements.txt
+sudo -u $APP_USER bash -c "
+    if [ ! -d 'venv' ]; then
+        python3 -m venv venv
+    fi
+    ./venv/bin/python3 -m pip install --upgrade pip
+    ./venv/bin/python3 -m pip install -r requirements.txt
+"
 
 echo "[4/5] Gunicorn Systemd 서비스 등록"
 cat <<EOF > /etc/systemd/system/stock.service
