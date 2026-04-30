@@ -30,9 +30,9 @@ fi
 echo "[3/5] Python 가상환경 구성 및 패키지 설치"
 cd $REPO_DIR
 sudo -u $APP_USER bash -c "
-    if [ ! -d 'venv' ]; then
-        python3 -m venv venv
-    fi
+    echo '기존 가상환경 초기화 중...'
+    rm -rf venv
+    python3 -m venv venv
     ./venv/bin/python3 -m pip install --upgrade pip
     ./venv/bin/python3 -m pip install -r requirements.txt
 "
