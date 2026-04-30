@@ -62,9 +62,10 @@ def get_intraday_data(name: str):
             df_latest = df[df.index.date == latest_date].copy()
             
             # 마감 시간 보정 (15:30)
+            # yfinance가 종가 데이터를 14:55까지만 제공하는 경우가 있으므로, 마지막 데이터 포인트를 15:30으로 고정
             if not df_latest.empty:
                 last_idx = df_latest.index[-1]
-                if last_idx.hour == 15 and last_idx.minute >= 15:
+                if 14 <= last_idx.hour <= 16:
                     new_idx = last_idx.replace(hour=15, minute=30)
                     df_latest.index = df_latest.index.delete(-1).insert(len(df_latest)-1, new_idx)
         elif name == 'WTI':
