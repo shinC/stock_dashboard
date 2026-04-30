@@ -173,21 +173,32 @@ def get_daily_summary(name: str):
         return None
     try:
         import pytz
-        now = datetime.now(pytz.timezone('Asia/Seoul'))
+        from datetime import datetime, timedelta
+        import pandas as pd
+        
         if name in ['KOSPI', 'KOSDAQ', 'KOSPI 200', 'KOSDAQ 150']:
             fdr_map = {'KOSPI': 'KS11', 'KOSDAQ': 'KQ11', 'KOSPI 200': 'KS200', 'KOSDAQ 150': 'KQ150'}
             df = fdr.DataReader(fdr_map.get(name))
             if df.empty or len(df) < 3: return None
             
-            # 한국 시장: 15:45 이전이면 [마지막-1]이 어제 종가, [마지막-2]가 그저께 종가
-            if now.hour < 15 or (now.hour == 15 and now.minute < 45):
-                current_close = float(df['Close'].iloc[-2])
-                current_open = float(df['Open'].iloc[-2])
-                prev_close = float(df['Close'].iloc[-3])
+            # 한국 시장: 15:45 이전이면 아직 거래중이거나 마감 전으로 간주하여 전일 데이터 사용
+            now_kst = datetime.now(pytz.timezone('Asia/Seoul'))
+            if now_kst.time() < datetime.strptime("15:45", "%H:%M").time():
+                max_final_date = now_kst.date() - timedelta(days=1)
             else:
-                current_close = float(df['Close'].iloc[-1])
-                current_open = float(df['Open'].iloc[-1])
-                prev_close = float(df['Close'].iloc[-2])
+                max_final_date = now_kst.date()
+                
+            max_final_ts = pd.Timestamp(max_final_date)
+            if df.index.tz is not None:
+                max_final_ts = max_final_ts.tz_localize(df.index.tz)
+                
+            df_filtered = df[df.index <= max_final_ts]
+            if len(df_filtered) < 2:
+                df_filtered = df  # fallback
+                
+            current_close = float(df_filtered['Close'].iloc[-1])
+            current_open = float(df_filtered['Open'].iloc[-1])
+            prev_close = float(df_filtered['Close'].iloc[-2])
         else:
             df = yf.download(ticker, period='7d', interval='1d', progress=False)
             if df.empty or len(df) < 3: return None
@@ -198,15 +209,24 @@ def get_daily_summary(name: str):
             else:
                 close_col, open_col = 'Close', 'Open'
 
-            # 미국 시장: 오전 05:30 이전이면 아직 장중이거나 결과 정리 전으로 간주
-            if now.hour < 5 or (now.hour == 5 and now.minute < 30):
-                current_close = float(df[close_col].iloc[-2])
-                current_open = float(df[open_col].iloc[-2])
-                prev_close = float(df[close_col].iloc[-3])
+            # 미국 시장: 뉴욕 시간 기준 16:00 이전이면 아직 거래중이거나 마감 전으로 간주
+            now_ny = datetime.now(pytz.timezone('America/New_York'))
+            if now_ny.time() < datetime.strptime("16:00", "%H:%M").time():
+                max_final_date = now_ny.date() - timedelta(days=1)
             else:
-                current_close = float(df[close_col].iloc[-1])
-                current_open = float(df[open_col].iloc[-1])
-                prev_close = float(df[close_col].iloc[-2])
+                max_final_date = now_ny.date()
+                
+            max_final_ts = pd.Timestamp(max_final_date)
+            if df.index.tz is not None:
+                max_final_ts = max_final_ts.tz_localize(df.index.tz)
+                
+            df_filtered = df[df.index <= max_final_ts]
+            if len(df_filtered) < 2:
+                df_filtered = df  # fallback
+                
+            current_close = float(df_filtered[close_col].iloc[-1])
+            current_open = float(df_filtered[open_col].iloc[-1])
+            prev_close = float(df_filtered[close_col].iloc[-2])
             
         change_pct = ((current_close - prev_close) / prev_close) * 100
         
