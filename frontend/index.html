@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Stock Dashboard</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for beautiful mini-charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1>글로벌 시장 동향</h1>
+            <p>실시간 미국 & 한국 지수 및 주도 테마 흐름</p>
+        </header>
+
+        <!-- 탭 네비게이션 추가 -->
+        <div class="tabs-container">
+            <button class="tab-btn active" data-target="us-section">미국 시장</button>
+            <button class="tab-btn" data-target="kr-section">한국 시장</button>
+        </div>
+
+        <section class="market-section" id="us-section">
+            <h2>미국 시장</h2>
+            <div class="grid" id="us-market-grid">
+                <!-- Cards injected by JS -->
+            </div>
+            
+            <div class="section-header space-between" style="margin-top: 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0;">미국 섹터 및 테마 시황</h3>
+                <div class="controls-group">
+                    <button id="filter-btn" class="premium-btn">보기 설정 <span class="btn-icon">👁️</span></button>
+                    <button id="sort-btn" class="premium-btn primary">정렬 기준 <span class="btn-icon">▲</span></button>
+                </div>
+            </div>
+            <div id="sectors-container" class="board-container">
+                <!-- Data injected by JS -->
+            </div>
+        </section>
+
+        <section class="market-section" id="kr-section">
+            <h2>한국 시장</h2>
+            <div class="grid" id="kr-market-grid">
+                <!-- Cards injected by JS -->
+            </div>
+
+            <h3 style="margin-top: 2.5rem;">한국 주도 테마</h3>
+            <div id="themes-container">
+                <!-- Tables injected by JS -->
+            </div>
+        </section>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

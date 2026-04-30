@@ -1,0 +1,11 @@
+Flask
+requests
+yfinance
+cachetools
+google-genai
+python-dotenv
+flask-cors
+beautifulsoup4
+pandas
+numpy
+finance-datareader

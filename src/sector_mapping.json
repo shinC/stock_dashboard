@@ -1,0 +1,1314 @@
+{
+    "ai": {
+        "sector_en": "AI",
+        "sector_kr": "인공지능",
+        "themes": {
+            "aicompute": {
+                "en": "AI Compute",
+                "kr": "컴퓨팅"
+            },
+            "aicloud": {
+                "en": "AI Cloud",
+                "kr": "클라우드"
+            },
+            "aimodels": {
+                "en": "AI Models",
+                "kr": "모델"
+            },
+            "aidata": {
+                "en": "AI Data",
+                "kr": "데이터"
+            },
+            "aienterprise": {
+                "en": "AI Enterprise",
+                "kr": "엔터프라이즈"
+            },
+            "ainetworking": {
+                "en": "AI Networking",
+                "kr": "네트워킹"
+            },
+            "aisecurity": {
+                "en": "AI Security",
+                "kr": "보안"
+            },
+            "aiedge": {
+                "en": "AI Edge",
+                "kr": "엣지"
+            },
+            "airobotics": {
+                "en": "AI Robotics",
+                "kr": "로보틱스"
+            },
+            "aiapplications": {
+                "en": "AI Applications",
+                "kr": "애플리케이션"
+            },
+            "aiadssearch": {
+                "en": "AI Ads & Search",
+                "kr": "광고 및 검색"
+            },
+            "aienergy": {
+                "en": "AI Energy",
+                "kr": "에너지"
+            },
+            "aiagi": {
+                "en": "AI AGI",
+                "kr": "범용 인공지능(AGI)"
+            }
+        }
+    },
+    "cloud": {
+        "sector_en": "Cloud",
+        "sector_kr": "클라우드",
+        "themes": {
+            "cloudhyperscalers": {
+                "en": "Cloud Hyperscalers",
+                "kr": "하이퍼스케일러"
+            },
+            "clouddatacenters": {
+                "en": "Cloud Data Centers",
+                "kr": "데이터센터"
+            },
+            "clouddatabases": {
+                "en": "Cloud Databases",
+                "kr": "데이터베이스"
+            },
+            "clouddevops": {
+                "en": "Cloud DevOps",
+                "kr": "데브옵스"
+            },
+            "cloudsecurity": {
+                "en": "Cloud Security",
+                "kr": "보안"
+            },
+            "cloudhybridcloud": {
+                "en": "Cloud Hybrid Cloud",
+                "kr": "하이브리드"
+            },
+            "cloudmulticloud": {
+                "en": "Cloud Multi Cloud",
+                "kr": "멀티클라우드"
+            },
+            "cloudserverless": {
+                "en": "Cloud Serverless",
+                "kr": "서버리스"
+            },
+            "cloudpaas": {
+                "en": "Cloud PaaS",
+                "kr": "PaaS"
+            },
+            "cloudhardware": {
+                "en": "Cloud Hardware",
+                "kr": "하드웨어"
+            },
+            "cloudedge": {
+                "en": "Cloud Edge",
+                "kr": "엣지"
+            },
+            "cloudhsaas": {
+                "en": "Cloud HSaaS",
+                "kr": "하드웨어형 SaaS"
+            }
+        }
+    },
+    "semis": {
+        "sector_en": "Semiconductors",
+        "sector_kr": "반도체",
+        "themes": {
+            "semiscompute": {
+                "en": "Compute",
+                "kr": "컴퓨팅"
+            },
+            "semismemory": {
+                "en": "Memory",
+                "kr": "메모리"
+            },
+            "semisanalog": {
+                "en": "Analog",
+                "kr": "아날로그"
+            },
+            "semiswireless": {
+                "en": "Wireless",
+                "kr": "무선"
+            },
+            "semisfoundries": {
+                "en": "Foundries",
+                "kr": "파운드리"
+            },
+            "semisdesigntools": {
+                "en": "Design Tools",
+                "kr": "설계도구(EDA)"
+            },
+            "semislithography": {
+                "en": "Lithography",
+                "kr": "노광 장비"
+            },
+            "semispackaging": {
+                "en": "Packaging",
+                "kr": "패키징"
+            },
+            "semisnextgen": {
+                "en": "Next Gen",
+                "kr": "차세대"
+            }
+        }
+    },
+    "cybersecurity": {
+        "sector_en": "Cybersecurity",
+        "sector_kr": "사이버보안",
+        "themes": {
+            "cybersecurityzerotrust": {
+                "en": "Zero Trust",
+                "kr": "제로 트러스트"
+            },
+            "cybersecurityendpoint": {
+                "en": "Endpoint",
+                "kr": "엔드포인트"
+            },
+            "cybersecuritynetwork": {
+                "en": "Network",
+                "kr": "네트워크"
+            },
+            "cybersecuritycloud": {
+                "en": "Cloud",
+                "kr": "클라우드"
+            },
+            "cybersecurityidentityiam": {
+                "en": "Identity IAM",
+                "kr": "ID 및 권한관리"
+            },
+            "cybersecuritythreatops": {
+                "en": "Threat Ops",
+                "kr": "위협 대응"
+            },
+            "cybersecuritysiem": {
+                "en": "SIEM",
+                "kr": "보안 관제(SIEM)"
+            },
+            "cybersecurityappsecurity": {
+                "en": "App Security",
+                "kr": "앱 보안"
+            }
+        }
+    },
+    "software": {
+        "sector_en": "Software",
+        "sector_kr": "소프트웨어",
+        "themes": {
+            "softwareos": {
+                "en": "OS",
+                "kr": "운영체제"
+            },
+            "softwareenterprise": {
+                "en": "Enterprise",
+                "kr": "엔터프라이즈"
+            },
+            "softwarecrm": {
+                "en": "CRM",
+                "kr": "CRM"
+            },
+            "softwarecollaboration": {
+                "en": "Collaboration",
+                "kr": "협업"
+            },
+            "softwaregaming": {
+                "en": "Gaming",
+                "kr": "게임"
+            },
+            "softwareecommerce": {
+                "en": "E-commerce",
+                "kr": "이커머스 솔루션"
+            },
+            "softwaredesign": {
+                "en": "Design",
+                "kr": "디자인"
+            },
+            "softwaresecurity": {
+                "en": "Security",
+                "kr": "보안"
+            },
+            "softwaredevops": {
+                "en": "DevOps",
+                "kr": "데브옵스"
+            },
+            "softwaredataanalytics": {
+                "en": "Data Analytics",
+                "kr": "데이터 분석"
+            },
+            "softwarehsaas": {
+                "en": "HSaaS",
+                "kr": "하드웨어형 SaaS"
+            },
+            "softwarevsaas": {
+                "en": "VSaaS",
+                "kr": "버티컬 SaaS"
+            }
+        }
+    },
+    "hardware": {
+        "sector_en": "Hardware",
+        "sector_kr": "하드웨어",
+        "themes": {
+            "hardwarepcsdevices": {
+                "en": "PCs/Devices",
+                "kr": "PC 및 디바이스"
+            },
+            "hardwareservers": {
+                "en": "Servers",
+                "kr": "서버"
+            },
+            "hardwarenetworking": {
+                "en": "Networking",
+                "kr": "네트워킹"
+            },
+            "hardwarestorage": {
+                "en": "Storage",
+                "kr": "스토리지"
+            },
+            "hardwaredatacenters": {
+                "en": "Data Centers",
+                "kr": "데이터센터 인프라"
+            },
+            "hardwareelectronics": {
+                "en": "Electronics",
+                "kr": "가전 및 부품"
+            },
+            "hardwaregaming": {
+                "en": "Gaming",
+                "kr": "게임"
+            },
+            "hardwareprinting": {
+                "en": "Printing",
+                "kr": "프린팅"
+            },
+            "hardwaretelecom": {
+                "en": "Telecom",
+                "kr": "통신 장비"
+            },
+            "hardwareindustrialiot": {
+                "en": "Industrial IoT",
+                "kr": "산업용 IoT"
+            },
+            "hardwarenextgen": {
+                "en": "Next Gen",
+                "kr": "차세대"
+            }
+        }
+    },
+    "quantum": {
+        "sector_en": "Quantum Computing",
+        "sector_kr": "양자컴퓨팅",
+        "themes": {
+            "quantumhardware": {
+                "en": "Hardware",
+                "kr": "하드웨어"
+            },
+            "quantumcloud": {
+                "en": "Cloud",
+                "kr": "클라우드"
+            },
+            "quantumsoftware": {
+                "en": "Software",
+                "kr": "소프트웨어"
+            },
+            "quantumenablingtech": {
+                "en": "Enabling Tech",
+                "kr": "구현기술"
+            },
+            "quantumnetworking": {
+                "en": "Networking",
+                "kr": "네트워킹"
+            },
+            "quantumapplications": {
+                "en": "Applications",
+                "kr": "애플리케이션"
+            }
+        }
+    },
+    "vareality": {
+        "sector_en": "Virtual Reality",
+        "sector_kr": "가상현실",
+        "themes": {
+            "varealityhardware": {
+                "en": "Hardware",
+                "kr": "하드웨어"
+            },
+            "varealitysoftware": {
+                "en": "Software",
+                "kr": "소프트웨어"
+            },
+            "varealityapplications": {
+                "en": "Applications",
+                "kr": "애플리케이션"
+            },
+            "varealityinfrastructure": {
+                "en": "Infrastructure",
+                "kr": "인프라"
+            },
+            "varealityenterprise": {
+                "en": "Enterprise",
+                "kr": "엔터프라이즈"
+            }
+        }
+    },
+    "biometrics": {
+        "sector_en": "Biometrics",
+        "sector_kr": "생체인식",
+        "themes": {
+            "biometricshardware": {
+                "en": "Hardware",
+                "kr": "하드웨어"
+            },
+            "biometricssoftware": {
+                "en": "Software",
+                "kr": "소프트웨어"
+            },
+            "biometricsidentity": {
+                "en": "Identity",
+                "kr": "신원인증"
+            },
+            "biometricsgovdefense": {
+                "en": "Gov/Defense",
+                "kr": "정부/국방"
+            }
+        }
+    },
+    "bigdata": {
+        "sector_en": "Big Data",
+        "sector_kr": "빅데이터",
+        "themes": {
+            "bigdatainfrastructure": {
+                "en": "Infrastructure",
+                "kr": "인프라"
+            },
+            "bigdataanalyticsbi": {
+                "en": "Analytics/BI",
+                "kr": "분석/BI"
+            },
+            "bigdataproviders": {
+                "en": "Providers",
+                "kr": "데이터 공급자"
+            },
+            "bigdataaiplatforms": {
+                "en": "AI Platforms",
+                "kr": "AI 플랫폼"
+            }
+        }
+    },
+    "evs": {
+        "sector_en": "EVs",
+        "sector_kr": "전기차",
+        "themes": {
+            "evsmanufacturers": {
+                "en": "Manufacturers",
+                "kr": "제조사"
+            },
+            "evsbatteries": {
+                "en": "Batteries",
+                "kr": "배터리"
+            },
+            "evscharging": {
+                "en": "Charging",
+                "kr": "충전 인프라"
+            },
+            "evschips": {
+                "en": "Chips",
+                "kr": "반도체"
+            },
+            "evssuppliers": {
+                "en": "Suppliers",
+                "kr": "부품사"
+            },
+            "evsselfdriving": {
+                "en": "Self Driving",
+                "kr": "자율주행"
+            },
+            "evsfleets": {
+                "en": "Fleets",
+                "kr": "운송 관리(Fleet)"
+            }
+        }
+    },
+    "automation": {
+        "sector_en": "Automation",
+        "sector_kr": "자동화",
+        "themes": {
+            "automationrobotics": {
+                "en": "Robotics",
+                "kr": "로보틱스"
+            },
+            "automationautomation": {
+                "en": "Automation",
+                "kr": "자동화 시스템"
+            },
+            "automationmachinevision": {
+                "en": "Machine Vision",
+                "kr": "머신비전"
+            },
+            "automationsoftware": {
+                "en": "Software",
+                "kr": "소프트웨어"
+            },
+            "automationiot": {
+                "en": "IoT",
+                "kr": "IoT"
+            },
+            "automationlogistics": {
+                "en": "Logistics",
+                "kr": "물류"
+            },
+            "automationdprinting": {
+                "en": "3D Printing",
+                "kr": "3D 프린팅"
+            }
+        }
+    },
+    "defense": {
+        "sector_en": "Defense",
+        "sector_kr": "국방/방산",
+        "themes": {
+            "defensedrones": {
+                "en": "Drones",
+                "kr": "드론"
+            },
+            "defensemissiles": {
+                "en": "Missiles",
+                "kr": "미사일"
+            },
+            "defensespacetech": {
+                "en": "Space Tech",
+                "kr": "우주 기술"
+            },
+            "defensecyberdefense": {
+                "en": "Cyber Defense",
+                "kr": "사이버 방어"
+            },
+            "defenseweapons": {
+                "en": "Weapons",
+                "kr": "무기 체계"
+            },
+            "defenseaviation": {
+                "en": "Aviation",
+                "kr": "항공"
+            },
+            "defensemanufacturing": {
+                "en": "Manufacturing",
+                "kr": "제조"
+            }
+        }
+    },
+    "transportation": {
+        "sector_en": "Transportation",
+        "sector_kr": "운송",
+        "themes": {
+            "transportationrail": {
+                "en": "Rail",
+                "kr": "철도"
+            },
+            "transportationtrucking": {
+                "en": "Trucking",
+                "kr": "트러킹"
+            },
+            "transportationaircargo": {
+                "en": "Air Cargo",
+                "kr": "항공 화물"
+            },
+            "transportationmaritime": {
+                "en": "Maritime",
+                "kr": "해운"
+            },
+            "transportationwarehousing": {
+                "en": "Warehousing",
+                "kr": "창고"
+            },
+            "transportationairtravel": {
+                "en": "Air Travel",
+                "kr": "항공 여행"
+            },
+            "transportationinfrastructure": {
+                "en": "Infrastructure",
+                "kr": "인프라"
+            },
+            "transportationnextgen": {
+                "en": "Next Gen",
+                "kr": "차세대 운송"
+            }
+        }
+    },
+    "space": {
+        "sector_en": "Space",
+        "sector_kr": "우주",
+        "themes": {
+            "spacelaunch": {
+                "en": "Launch",
+                "kr": "발사체"
+            },
+            "spacesatellites": {
+                "en": "Satellites",
+                "kr": "위성"
+            },
+            "spacedataanalytics": {
+                "en": "Data Analytics",
+                "kr": "데이터 분석"
+            },
+            "spacedefense": {
+                "en": "Defense",
+                "kr": "국방"
+            },
+            "spaceinfrastructure": {
+                "en": "Infrastructure",
+                "kr": "인프라"
+            }
+        }
+    },
+    "robotics": {
+        "sector_en": "Robotics",
+        "sector_kr": "로봇공학",
+        "themes": {
+            "roboticsautomation": {
+                "en": "Automation",
+                "kr": "자동화"
+            },
+            "roboticslogistics": {
+                "en": "Logistics",
+                "kr": "물류"
+            },
+            "roboticsavmobility": {
+                "en": "AV Mobility",
+                "kr": "모빌리티"
+            },
+            "roboticsmachinevision": {
+                "en": "Machine Vision",
+                "kr": "머신비전"
+            },
+            "roboticsmedical": {
+                "en": "Medical",
+                "kr": "의료로봇"
+            },
+            "roboticsconsumer": {
+                "en": "Consumer",
+                "kr": "소비자용"
+            }
+        }
+    },
+    "telecom": {
+        "sector_en": "Telecom",
+        "sector_kr": "통신",
+        "themes": {
+            "telecomwireless": {
+                "en": "Wireless",
+                "kr": "무선"
+            },
+            "telecominfrastructure": {
+                "en": "Infrastructure",
+                "kr": "인프라"
+            },
+            "telecomcloudedge": {
+                "en": "Cloud Edge",
+                "kr": "클라우드 엣지"
+            },
+            "telecomg": {
+                "en": "5G",
+                "kr": "5G"
+            },
+            "telecomsatcom": {
+                "en": "Satcom",
+                "kr": "위성통신"
+            },
+            "telecomenterprise": {
+                "en": "Enterprise",
+                "kr": "엔터프라이즈"
+            }
+        }
+    },
+    "nanotech": {
+        "sector_en": "Nanotechnology",
+        "sector_kr": "나노기술",
+        "themes": {
+            "nanotechmaterials": {
+                "en": "Materials",
+                "kr": "소재"
+            },
+            "nanotechmedicine": {
+                "en": "Medicine",
+                "kr": "의료"
+            },
+            "nanotechelectronics": {
+                "en": "Electronics",
+                "kr": "전자"
+            },
+            "nanotechenergy": {
+                "en": "Energy",
+                "kr": "에너지"
+            },
+            "nanotechproducts": {
+                "en": "Products",
+                "kr": "제품"
+            },
+            "nanotechresearchtools": {
+                "en": "Research Tools",
+                "kr": "연구도구"
+            }
+        }
+    },
+    "iot": {
+        "sector_en": "IoT",
+        "sector_kr": "사물인터넷",
+        "themes": {
+            "iotedgedevices": {
+                "en": "Edge Devices",
+                "kr": "엣지 디바이스"
+            },
+            "iotnetworking": {
+                "en": "Networking",
+                "kr": "네트워킹"
+            },
+            "iothardware": {
+                "en": "Hardware",
+                "kr": "하드웨어"
+            },
+            "iotsoftware": {
+                "en": "Software",
+                "kr": "소프트웨어"
+            },
+            "iotenterprise": {
+                "en": "Enterprise",
+                "kr": "엔터프라이즈"
+            },
+            "iotsecurity": {
+                "en": "Security",
+                "kr": "보안"
+            }
+        }
+    },
+    "autonomous": {
+        "sector_en": "Autonomous Systems",
+        "sector_kr": "자율주행",
+        "themes": {
+            "autonomousavmobility": {
+                "en": "AV Mobility",
+                "kr": "모빌리티"
+            },
+            "autonomousindustrial": {
+                "en": "Industrial",
+                "kr": "산업용"
+            },
+            "autonomousdefense": {
+                "en": "Defense",
+                "kr": "국방"
+            },
+            "autonomousmachinevision": {
+                "en": "Machine Vision",
+                "kr": "머신비전"
+            },
+            "autonomoussoftware": {
+                "en": "Software",
+                "kr": "소프트웨어"
+            },
+            "autonomousspecialized": {
+                "en": "Specialized",
+                "kr": "특수차량"
+            }
+        }
+    },
+    "ecommerce": {
+        "sector_en": "E-commerce",
+        "sector_kr": "이커머스",
+        "themes": {
+            "ecommercemarketplaces": {
+                "en": "Marketplaces",
+                "kr": "마켓플레이스"
+            },
+            "ecommerceplatforms": {
+                "en": "Platforms",
+                "kr": "플랫폼"
+            },
+            "ecommerceadsmedia": {
+                "en": "Ads & Media",
+                "kr": "광고 및 미디어"
+            },
+            "ecommercelogistics": {
+                "en": "Logistics",
+                "kr": "물류"
+            },
+            "ecommercesocial": {
+                "en": "Social",
+                "kr": "소셜 커커스"
+            },
+            "ecommerceomnichannel": {
+                "en": "Omnichannel",
+                "kr": "옴니채널"
+            },
+            "ecommercegrocery": {
+                "en": "Grocery",
+                "kr": "식료품"
+            },
+            "ecommercesecondhand": {
+                "en": "Secondhand",
+                "kr": "중고거래"
+            },
+            "ecommercedtc": {
+                "en": "DTC",
+                "kr": "직판(DTC)"
+            }
+        }
+    },
+    "social": {
+        "sector_en": "Social Media",
+        "sector_kr": "소셜 미디어",
+        "themes": {
+            "socialnetworks": {
+                "en": "Networks",
+                "kr": "네트워크"
+            },
+            "socialvisualcontent": {
+                "en": "Visual Content",
+                "kr": "비주얼 콘텐츠"
+            },
+            "socialadvertising": {
+                "en": "Advertising",
+                "kr": "광고"
+            },
+            "socialgaming": {
+                "en": "Gaming",
+                "kr": "게임"
+            },
+            "socialniche": {
+                "en": "Niche",
+                "kr": "니치 마켓"
+            }
+        }
+    },
+    "entertainment": {
+        "sector_en": "Entertainment",
+        "sector_kr": "엔터테인먼트",
+        "themes": {
+            "entertainmentvideo": {
+                "en": "Video",
+                "kr": "비디오"
+            },
+            "entertainmentmusic": {
+                "en": "Music",
+                "kr": "뮤직"
+            },
+            "entertainmentgaming": {
+                "en": "Gaming",
+                "kr": "게임"
+            },
+            "entertainmentinfrastructure": {
+                "en": "Infrastructure",
+                "kr": "인프라"
+            },
+            "entertainmentbetting": {
+                "en": "Betting",
+                "kr": "베팅"
+            },
+            "entertainmentgambling": {
+                "en": "Gambling",
+                "kr": "도박"
+            }
+        }
+    },
+    "realestate": {
+        "sector_en": "Real Estate",
+        "sector_kr": "부동산",
+        "themes": {
+            "realestateittelecom": {
+                "en": "IT/Telecom",
+                "kr": "IT/통신 부동산"
+            },
+            "realestatewarehousing": {
+                "en": "Warehousing",
+                "kr": "창고/물류"
+            },
+            "realestatehealthcare": {
+                "en": "Healthcare",
+                "kr": "헬스케어"
+            },
+            "realestatehousing": {
+                "en": "Housing",
+                "kr": "주택"
+            },
+            "realestatetourism": {
+                "en": "Tourism",
+                "kr": "관광"
+            },
+            "realestateretail": {
+                "en": "Retail",
+                "kr": "리테일"
+            },
+            "realestateoffice": {
+                "en": "Office",
+                "kr": "오피스"
+            }
+        }
+    },
+    "consumer": {
+        "sector_en": "Consumer Goods",
+        "sector_kr": "소비재",
+        "themes": {
+            "consumerfood": {
+                "en": "Food",
+                "kr": "식품"
+            },
+            "consumerapparel": {
+                "en": "Apparel",
+                "kr": "의류"
+            },
+            "consumerluxury": {
+                "en": "Luxury",
+                "kr": "명품"
+            },
+            "consumerfarmdirect": {
+                "en": "Farm Direct",
+                "kr": "농산물 직판"
+            },
+            "consumerhousehold": {
+                "en": "Household",
+                "kr": "가정용품"
+            },
+            "consumersecondhand": {
+                "en": "Secondhand",
+                "kr": "중고품"
+            }
+        }
+    },
+    "smarthome": {
+        "sector_en": "Smart Home",
+        "sector_kr": "스마트홈",
+        "themes": {
+            "smarthomedevices": {
+                "en": "Devices",
+                "kr": "기기"
+            },
+            "smarthomeautomation": {
+                "en": "Automation",
+                "kr": "자동화"
+            },
+            "smarthomesecurity": {
+                "en": "Security",
+                "kr": "보안"
+            },
+            "smarthomeenergy": {
+                "en": "Energy",
+                "kr": "에너지"
+            },
+            "smarthomenetworking": {
+                "en": "Networking",
+                "kr": "네트워킹"
+            },
+            "smarthomevoiceai": {
+                "en": "Voice AI",
+                "kr": "음성 AI"
+            }
+        }
+    },
+    "wearables": {
+        "sector_en": "Wearables",
+        "sector_kr": "웨어러블",
+        "themes": {
+            "wearablessmartwatches": {
+                "en": "Smartwatches",
+                "kr": "스마트워치"
+            },
+            "wearablesmedical": {
+                "en": "Medical",
+                "kr": "의료용"
+            },
+            "wearablesimmersive": {
+                "en": "Immersive",
+                "kr": "몰입형(XR)"
+            },
+            "wearablessoftware": {
+                "en": "Software",
+                "kr": "소프트웨어"
+            },
+            "wearablessport": {
+                "en": "Sport",
+                "kr": "스포츠"
+            }
+        }
+    },
+    "education": {
+        "sector_en": "Education",
+        "sector_kr": "교육",
+        "themes": {
+            "educationplatforms": {
+                "en": "Platforms",
+                "kr": "플랫폼"
+            },
+            "educationworkforce": {
+                "en": "Workforce",
+                "kr": "인력 양성"
+            },
+            "educationcurriculum": {
+                "en": "Curriculum",
+                "kr": "커리큘럼"
+            },
+            "educationinfrastructure": {
+                "en": "Infrastructure",
+                "kr": "인프라"
+            }
+        }
+    },
+    "energyclean": {
+        "sector_en": "Clean Energy",
+        "sector_kr": "신재생 에너지",
+        "themes": {
+            "energycleansolar": {
+                "en": "Solar",
+                "kr": "태양광"
+            },
+            "energycleanwind": {
+                "en": "Wind",
+                "kr": "풍력"
+            },
+            "energycleanhydrogen": {
+                "en": "Hydrogen",
+                "kr": "수소"
+            },
+            "energycleangeothermal": {
+                "en": "Geothermal",
+                "kr": "지열"
+            },
+            "energycleanutilities": {
+                "en": "Utilities",
+                "kr": "유틸리티"
+            },
+            "energycleanbatteries": {
+                "en": "Batteries",
+                "kr": "ESS/배터리"
+            },
+            "energycleansmartgrid": {
+                "en": "Smart Grid",
+                "kr": "스마트 그리드"
+            },
+            "energycleanmaterials": {
+                "en": "Materials",
+                "kr": "에너지 소재"
+            },
+            "energycleanbiofuels": {
+                "en": "Biofuels",
+                "kr": "바이오 연료"
+            }
+        }
+    },
+    "energybase": {
+        "sector_en": "Traditional Energy",
+        "sector_kr": "전통 에너지",
+        "themes": {
+            "energybaseoilproduction": {
+                "en": "Oil Production",
+                "kr": "원유 생산"
+            },
+            "energybaseoilrefining": {
+                "en": "Oil Refining",
+                "kr": "원유 정제"
+            },
+            "energybaseoilservices": {
+                "en": "Oil Services",
+                "kr": "에너지 서비스"
+            },
+            "energybasethermal": {
+                "en": "Thermal",
+                "kr": "화력 발전"
+            },
+            "energybasenuclear": {
+                "en": "Nuclear",
+                "kr": "원자력 발전"
+            },
+            "energybasemajors": {
+                "en": "Majors",
+                "kr": "메이저 정유사"
+            },
+            "energybaseutilities": {
+                "en": "Utilities",
+                "kr": "유틸리티"
+            }
+        }
+    },
+    "commenergy": {
+        "sector_en": "Energy Commodities",
+        "sector_kr": "에너지 원자재",
+        "themes": {
+            "commenergyoil": {
+                "en": "Oil",
+                "kr": "원유"
+            },
+            "commenergygaslng": {
+                "en": "Gas/LNG",
+                "kr": "천연가스/LNG"
+            },
+            "commenergyuranium": {
+                "en": "Uranium",
+                "kr": "우라늄"
+            },
+            "commenergybiofuels": {
+                "en": "Biofuels",
+                "kr": "바이오연료"
+            }
+        }
+    },
+    "commmetals": {
+        "sector_en": "Metal Commodities",
+        "sector_kr": "금속 원자재",
+        "themes": {
+            "commmetalsgold": {
+                "en": "Gold",
+                "kr": "금"
+            },
+            "commmetalssilver": {
+                "en": "Silver",
+                "kr": "은"
+            },
+            "commmetalsprecious": {
+                "en": "Precious",
+                "kr": "귀금속"
+            },
+            "commmetalsindustrial": {
+                "en": "Industrial",
+                "kr": "산업용 금속"
+            },
+            "commmetalsbattery": {
+                "en": "Battery",
+                "kr": "배터리 금속"
+            },
+            "commmetalsrareearth": {
+                "en": "Rare Earth",
+                "kr": "희토류"
+            },
+            "commmetalsrecycling": {
+                "en": "Recycling",
+                "kr": "재활용"
+            }
+        }
+    },
+    "commagri": {
+        "sector_en": "Agricultural Commodities",
+        "sector_kr": "농산물 원자재",
+        "themes": {
+            "commagrigrains": {
+                "en": "Grains",
+                "kr": "곡물"
+            },
+            "commagrisofts": {
+                "en": "Softs",
+                "kr": "기호식품"
+            },
+            "commagrilivestock": {
+                "en": "Livestock",
+                "kr": "축산물"
+            },
+            "commagrifertilizers": {
+                "en": "Fertilizers",
+                "kr": "비료"
+            },
+            "commagribiofuels": {
+                "en": "Biofuels",
+                "kr": "바이오연료"
+            }
+        }
+    },
+    "agriculture": {
+        "sector_en": "Agriculture",
+        "sector_kr": "농업",
+        "themes": {
+            "agriculturesmartfarming": {
+                "en": "Smart Farming",
+                "kr": "스마트 파밍"
+            },
+            "agriculturecropinputs": {
+                "en": "Crop Inputs",
+                "kr": "농업 투입재"
+            },
+            "agricultureindoorfarming": {
+                "en": "Indoor Farming",
+                "kr": "실내 농업"
+            },
+            "agriculturealtprotein": {
+                "en": "Alt Protein",
+                "kr": "대체 단백질"
+            },
+            "agricultureprocessing": {
+                "en": "Processing",
+                "kr": "가공"
+            }
+        }
+    },
+    "environmental": {
+        "sector_en": "Environmental",
+        "sector_kr": "환경",
+        "themes": {
+            "environmentalwater": {
+                "en": "Water",
+                "kr": "수처리"
+            },
+            "environmentalwaste": {
+                "en": "Waste",
+                "kr": "폐기물"
+            },
+            "environmentalairquality": {
+                "en": "Air Quality",
+                "kr": "대기질"
+            },
+            "environmentalclimate": {
+                "en": "Climate",
+                "kr": "기후변화"
+            },
+            "environmentalagriculture": {
+                "en": "Agriculture",
+                "kr": "농업 환경"
+            }
+        }
+    },
+    "healthcare": {
+        "sector_en": "Healthcare",
+        "sector_kr": "헬스케어",
+        "themes": {
+            "healthcarenextgen": {
+                "en": "Next Gen",
+                "kr": "차세대 의료"
+            },
+            "healthcareoncology": {
+                "en": "Oncology",
+                "kr": "종양학(암)"
+            },
+            "healthcaremetabolic": {
+                "en": "Metabolic",
+                "kr": "대사 질환"
+            },
+            "healthcarediagnostics": {
+                "en": "Diagnostics",
+                "kr": "의료 진단"
+            },
+            "healthcaregenomics": {
+                "en": "Genomics",
+                "kr": "유전체학"
+            },
+            "healthcaredevices": {
+                "en": "Devices",
+                "kr": "의료 기기"
+            },
+            "healthcaretelemedicine": {
+                "en": "Telemedicine",
+                "kr": "원격 의료"
+            },
+            "healthcareitdata": {
+                "en": "IT/Data",
+                "kr": "의료 IT/데이터"
+            },
+            "healthcaretherapeutics": {
+                "en": "Therapeutics",
+                "kr": "치료제"
+            }
+        }
+    },
+    "longevity": {
+        "sector_en": "Longevity",
+        "sector_kr": "장수/노화",
+        "themes": {
+            "longevityhealthcare": {
+                "en": "Healthcare",
+                "kr": "헬스케어"
+            },
+            "longevityagingpharma": {
+                "en": "Aging Pharma",
+                "kr": "노화 방지 제약"
+            },
+            "longevityseniorliving": {
+                "en": "Senior Living",
+                "kr": "실버타운"
+            },
+            "longevityhealthyaging": {
+                "en": "Healthy Aging",
+                "kr": "건강한 노후"
+            }
+        }
+    },
+    "nutrition": {
+        "sector_en": "Nutrition",
+        "sector_kr": "영양",
+        "themes": {
+            "nutritionaltprotein": {
+                "en": "Alt Protein",
+                "kr": "대체 단백질"
+            },
+            "nutritionretailers": {
+                "en": "Retailers",
+                "kr": "리테일러"
+            },
+            "nutritionsupplements": {
+                "en": "Supplements",
+                "kr": "영양제"
+            },
+            "nutritionmealdelivery": {
+                "en": "Meal Delivery",
+                "kr": "식단 배송"
+            }
+        }
+    },
+    "fintech": {
+        "sector_en": "Fintech",
+        "sector_kr": "핀테크",
+        "themes": {
+            "fintechpayments": {
+                "en": "Payments",
+                "kr": "결제"
+            },
+            "fintechneobanks": {
+                "en": "Neobanks",
+                "kr": "인터넷 은행"
+            },
+            "fintechlending": {
+                "en": "Lending",
+                "kr": "대출"
+            },
+            "fintechtrading": {
+                "en": "Trading",
+                "kr": "트레이딩"
+            },
+            "fintechblockchain": {
+                "en": "Blockchain",
+                "kr": "블록체인"
+            },
+            "fintechexchanges": {
+                "en": "Exchanges",
+                "kr": "거래소"
+            },
+            "fintechinsurance": {
+                "en": "Insurance",
+                "kr": "보험(인슈어테크)"
+            }
+        }
+    },
+    "blockchain": {
+        "sector_en": "Blockchain",
+        "sector_kr": "블록체인",
+        "themes": {
+            "blockchainplatforms": {
+                "en": "Platforms",
+                "kr": "플랫폼"
+            },
+            "blockchaininfrastructure": {
+                "en": "Infrastructure",
+                "kr": "인프라"
+            },
+            "blockchainpayments": {
+                "en": "Payments",
+                "kr": "결제"
+            },
+            "blockchainenterprise": {
+                "en": "Enterprise",
+                "kr": "엔터프라이즈"
+            },
+            "blockchaintokenization": {
+                "en": "Tokenization",
+                "kr": "토큰화"
+            },
+            "blockchainmining": {
+                "en": "Mining",
+                "kr": "채굴"
+            }
+        }
+    }
+}

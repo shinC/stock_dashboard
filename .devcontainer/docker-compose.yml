@@ -1,0 +1,10 @@
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/python:3.14-bookworm
+    volumes:
+      - ..:/workspaces/stock:cached
+    working_dir: /workspaces/stock
+    # 이 포트 설정이 없으면 외부 접속이 절대 안 됩니다
+    ports:
+      - "8080:8080"
+    command: sleep infinity
