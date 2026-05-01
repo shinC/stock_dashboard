@@ -3,7 +3,7 @@ const API_BASE = '/api';
 // Create a Chart.js instance for a canvas
 function createMiniChart(canvasId, data, color) {
     const ctx = document.getElementById(canvasId).getContext('2d');
-    
+
     // Extract values
     const labels = data.map(d => d.time);
     const values = data.map(d => d.value);
@@ -12,14 +12,14 @@ function createMiniChart(canvasId, data, color) {
     const gradient = ctx.createLinearGradient(0, 0, 0, 100);
     // Colors matching new CSS variables
     let rgbColor;
-    if (color === 'up-kr') rgbColor = '220, 38, 38'; 
+    if (color === 'up-kr') rgbColor = '220, 38, 38';
     else if (color === 'down-kr') rgbColor = '37, 99, 235';
-    else if (color === 'up-us') rgbColor = '22, 163, 74'; 
+    else if (color === 'up-us') rgbColor = '22, 163, 74';
     else if (color === 'down-us') rgbColor = '220, 38, 38';
     else if (color === 'up') rgbColor = '220, 38, 38'; // Default KR
     else if (color === 'down') rgbColor = '37, 99, 235'; // Default KR
     else rgbColor = '107, 114, 128';
-    
+
     gradient.addColorStop(0, `rgba(${rgbColor}, 0.3)`);
     gradient.addColorStop(1, `rgba(${rgbColor}, 0.0)`);
 
@@ -54,15 +54,15 @@ function createMiniChart(canvasId, data, color) {
                     borderWidth: 1,
                     padding: 10,
                     callbacks: {
-                        label: function(context) {
-                            return ` ${context.parsed.y.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                        label: function (context) {
+                            return ` ${context.parsed.y.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
                         }
                     }
                 }
             },
             scales: {
                 x: { display: false },
-                y: { 
+                y: {
                     display: false,
                     // Add slight padding to Y axis so line doesn't cut off
                     suggestedMin: Math.min(...values) * 0.999,
@@ -130,7 +130,7 @@ function generateCard(item, index, prefix) {
             <div class="card-header">
                 <div class="card-title">${item.name}</div>
             </div>
-            <div class="card-price">${val.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+            <div class="card-price">${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             <div class="card-change ${colorClass}">${chgText}</div>
             <div class="chart-container" style="margin-bottom: 0.5rem;">
                 <canvas id="${canvasId}"></canvas>
@@ -148,10 +148,10 @@ async function renderMarket(endpoint, containerId, prefix) {
     const container = document.getElementById(containerId);
     try {
         container.innerHTML = Array(4).fill('<div class="loading-skeleton"></div>').join('');
-        
+
         const res = await fetch(`${API_BASE}/${endpoint}`);
         const data = await res.json();
-        
+
         container.innerHTML = '';
         data.forEach((item, index) => {
             container.innerHTML += generateCard(item, index, prefix);
@@ -175,10 +175,10 @@ async function renderThemes() {
     const container = document.querySelector('#themes-container');
     try {
         container.innerHTML = `<div class="loading-skeleton" style="height:100px;"></div>`;
-        
+
         const res = await fetch(`${API_BASE}/themes`);
         const data = await res.json();
-        
+
         container.innerHTML = '';
         if (data.length === 0) {
             container.innerHTML = `<p>데이터 없음</p>`;
@@ -190,7 +190,7 @@ async function renderThemes() {
             const themeChg = theme['등락률(%)'];
             const themeChgText = themeChg > 0 ? `+${themeChg.toFixed(2)}%` : `${themeChg.toFixed(2)}%`;
             const themeColorClass = themeChg > 0 ? 'up-kr' : themeChg < 0 ? 'down-kr' : 'neutral';
-            
+
             // Create a wrapper for each theme
             const themeWrapper = document.createElement('div');
             themeWrapper.className = 'table-container';
@@ -211,13 +211,13 @@ async function renderThemes() {
             `;
             themeWrapper.style.padding = '0'; // Header takes its own padding
             themeWrapper.appendChild(themeHeader);
-            
+
             const tablePadding = document.createElement('div');
             tablePadding.style.padding = '1rem';
-            
+
             // Create a table for each theme
             const table = document.createElement('table');
-            
+
             const thead = document.createElement('thead');
             thead.innerHTML = `
                 <tr>
@@ -228,10 +228,10 @@ async function renderThemes() {
                 </tr>
             `;
             table.appendChild(thead);
-            
+
             const tbody = document.createElement('tbody');
             const stocks = theme.stocks || [];
-            
+
             if (stocks.length === 0) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -241,11 +241,11 @@ async function renderThemes() {
             } else {
                 stocks.forEach((stock, index) => {
                     const tr = document.createElement('tr');
-                    
+
                     if (stock.is_high_volume) {
                         tr.classList.add('high-volume-row');
                     }
-                    
+
                     let stockRate = stock['등락률'] || '0%';
                     let stockColorClass = 'neutral';
                     if (stockRate.startsWith('+') || stockRate.includes('상승') || stockRate.includes('상한가')) {
@@ -260,11 +260,11 @@ async function renderThemes() {
                         <td class="${stockColorClass}">${stock['등락률']}</td>
                         <td>${stock['거래대금']}</td>
                     `;
-                    
+
                     tbody.appendChild(tr);
                 });
             }
-            
+
             table.appendChild(tbody);
             tablePadding.appendChild(table);
             themeWrapper.appendChild(tablePadding);
@@ -294,11 +294,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Remove active from all
             tabBtns.forEach(b => b.classList.remove('active'));
             sections.forEach(s => s.classList.remove('active'));
-            
+
             // Add active to clicked
             btn.classList.add('active');
             const targetId = btn.getAttribute('data-target');
             document.getElementById(targetId).classList.add('active');
+
+            // Render chart if chart section activated
+            if (targetId === 'chart-section') {
+                renderTradingViewWidget();
+            }
         });
     });
 
@@ -342,6 +347,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cachedSectors.length > 0) renderSectorsBoard();
         }
     });
+
+    // Init Chart Logic
+    initChartLogic();
 });
 
 // --- Sector Rendering ---
@@ -361,7 +369,7 @@ function getColumnCount() {
 async function renderSectorsBoard() {
     const container = document.getElementById('sectors-container');
     if (!container) return;
-    
+
     // Fetch data if not cached
     if (cachedSectors.length === 0) {
         try {
@@ -375,14 +383,14 @@ async function renderSectorsBoard() {
     }
 
     container.innerHTML = '';
-    
+
     const numCols = getColumnCount();
     const boardCols = [];
-    
+
     for (let i = 0; i < numCols; i++) {
         const col = document.createElement('div');
         col.className = 'board-column';
-        col.id = `board-col-${i+1}`;
+        col.id = `board-col-${i + 1}`;
         container.appendChild(col);
         boardCols.push(col);
     }
@@ -401,7 +409,7 @@ async function renderSectorsBoard() {
     sectorsToRender.forEach((sector, i) => {
         const panel = document.createElement('div');
         panel.className = 'sector-panel';
-        
+
         const sIcon = sector.change > 0 ? '▲' : (sector.change < 0 ? '▼' : '−');
         const sValClass = sector.change > 0 ? 'val-pos' : (sector.change < 0 ? 'val-neg' : 'val-neu');
 
@@ -413,7 +421,7 @@ async function renderSectorsBoard() {
             <div class="sector-val ${sValClass}"><span class="indicator">${sIcon}</span> ${sector.change > 0 ? '+' : ''}${sector.change.toFixed(2)}%</div>
         `;
         panel.appendChild(header);
-        
+
         // Compact View logic
         let themesToRender = sector.themes;
         if (currentView === 'compact' && themesToRender.length > 3) {
@@ -429,25 +437,326 @@ async function renderSectorsBoard() {
             const row = document.createElement('div');
             const icon = theme.change > 0 ? '▲' : (theme.change < 0 ? '▼' : '−');
             let valClass = theme.change > 0 ? 'val-pos' : (theme.change < 0 ? 'val-neg' : 'val-neu');
-            
+
             row.className = `theme-row`;
-            
+
             // Highlight strong moves (3% threshold)
             if (theme.change >= 3) {
                 row.classList.add('row-pos-strong');
             } else if (theme.change <= -3) {
                 row.classList.add('row-neg-strong');
             }
-            
+
             row.innerHTML = `
                 <div class="theme-name"><span class="indicator">${icon}</span> ${theme.name}</div>
                 <div class="theme-val ${valClass}">${theme.change > 0 ? '+' : ''}${theme.change.toFixed(2)}%</div>
             `;
-            
+
             themeList.appendChild(row);
         });
 
         panel.appendChild(themeList);
         boardCols[i % numCols].appendChild(panel);
     });
+}
+
+// --- Chart Tab Logic ---
+const STORAGE_KEY = 'tv_symbols';
+
+function saveSymbolsToStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tvSymbols));
+}
+
+function loadSymbolsFromStorage() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (e) {
+            console.error("Failed to parse saved symbols", e);
+        }
+    }
+    // Default symbols
+    return [
+        { name: "Apple", symbol: "NASDAQ:AAPL" },
+        { name: "Google", symbol: "NASDAQ:GOOGL" },
+        { name: "Microsoft", symbol: "NASDAQ:MSFT" }
+    ];
+}
+
+let tvSymbols = loadSymbolsFromStorage();
+let activeSymbol = tvSymbols.length > 0 ? tvSymbols[0].symbol : "NASDAQ:AAPL";
+let searchTimeout = null;
+let isWidgetRendered = false;
+let currentFocusIndex = -1;
+let currentResults = [];
+
+function initChartLogic() {
+    const searchInput = document.getElementById('symbol-search-input');
+    const searchResults = document.getElementById('search-results');
+
+    if (!searchInput || !searchResults) return;
+
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+
+        if (searchTimeout) clearTimeout(searchTimeout);
+
+        if (query.length < 1) {
+            searchResults.classList.remove('active');
+            searchResults.innerHTML = '';
+            currentResults = [];
+            currentFocusIndex = -1;
+            return;
+        }
+
+        searchTimeout = setTimeout(async () => {
+            try {
+                const res = await fetch(`${API_BASE}/search-symbol?q=${encodeURIComponent(query)}`);
+                const data = await res.json();
+
+                // 검색어가 이미 지워졌거나 결과가 무효한 경우 렌더링 스킵
+                if (searchInput.value.trim().length === 0) {
+                    searchResults.classList.remove('active');
+                    searchResults.innerHTML = '';
+                    return;
+                }
+
+                searchResults.innerHTML = '';
+                currentResults = data;
+
+                if (data.length === 0) {
+                    currentFocusIndex = -1;
+                    searchResults.innerHTML = '<div style="padding: 12px 16px; color: var(--text-secondary);">결과가 없습니다.</div>';
+                } else {
+                    currentFocusIndex = 0; // Auto-focus first item
+                    data.forEach((item, index) => {
+                        const div = document.createElement('div');
+                        div.className = 'search-result-item';
+                        div.setAttribute('data-index', index);
+                        div.innerHTML = `
+                            <div>
+                                <span class="search-result-symbol">${item.symbol}</span>
+                                <span class="search-result-desc">${item.description}</span>
+                            </div>
+                            <span class="search-result-exchange">${item.exchange}</span>
+                        `;
+                        div.addEventListener('click', () => {
+                            selectItem(index);
+                        });
+                        searchResults.appendChild(div);
+                    });
+
+                    // Highlight the first item immediately
+                    const items = searchResults.querySelectorAll('.search-result-item');
+                    updateFocus(items);
+                }
+                searchResults.classList.add('active');
+            } catch (err) {
+                console.error("Search error:", err);
+            }
+        }, 300); // 300ms debounce
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+        const items = searchResults.querySelectorAll('.search-result-item');
+        if (!items.length) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (currentFocusIndex < items.length - 1) {
+                currentFocusIndex++;
+            } else {
+                currentFocusIndex = 0; // Wrap around to first
+            }
+            updateFocus(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (currentFocusIndex > 0) {
+                currentFocusIndex--;
+            } else {
+                currentFocusIndex = items.length - 1; // Wrap around to last
+            }
+            updateFocus(items);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (currentFocusIndex > -1) {
+                selectItem(currentFocusIndex);
+            }
+        } else if (e.key === 'Escape') {
+            searchResults.classList.remove('active');
+        }
+    });
+
+    function updateFocus(items) {
+        items.forEach((item, index) => {
+            if (index === currentFocusIndex) {
+                item.classList.add('selected');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+    }
+
+    function selectItem(index) {
+        const item = currentResults[index];
+        if (item) {
+            addSymbol(item.description || item.symbol, `${item.exchange}:${item.symbol}`);
+
+            // Aggressively clear input and state
+            if (searchTimeout) clearTimeout(searchTimeout);
+            searchInput.value = '';
+            searchResults.classList.remove('active');
+            currentResults = [];
+            currentFocusIndex = -1;
+
+            // Fix for IME (Korean) composition remaining after Enter
+            setTimeout(() => {
+                searchInput.value = '';
+                searchInput.blur(); // IME 조기 종료 유도
+                searchInput.focus(); // 다시 포커스
+            }, 10);
+        }
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.classList.remove('active');
+        }
+    });
+
+    updateSymbolChips();
+}
+
+function addSymbol(name, fullSymbol) {
+    // Check if already exists
+    if (!tvSymbols.find(s => s.symbol === fullSymbol)) {
+        tvSymbols.unshift({ name: name, symbol: fullSymbol });
+        activeSymbol = fullSymbol; // Set new symbol as active
+        saveSymbolsToStorage();
+        updateSymbolChips();
+        renderTradingViewWidget();
+    }
+}
+
+function removeSymbol(fullSymbol) {
+    tvSymbols = tvSymbols.filter(s => s.symbol !== fullSymbol);
+    saveSymbolsToStorage();
+    updateSymbolChips();
+    renderTradingViewWidget();
+}
+
+function updateSymbolChips() {
+    const container = document.getElementById('symbol-chips-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    tvSymbols.forEach((s) => {
+        const chip = document.createElement('div');
+        chip.className = 'symbol-chip';
+        // Highlight based on activeSymbol
+        if (s.symbol === activeSymbol) {
+            chip.classList.add('active');
+        }
+        
+        chip.innerHTML = `
+            <span class="chip-name">${s.name || s.symbol.split(':')[1]}</span>
+            <button class="symbol-chip-del" title="삭제">&times;</button>
+        `;
+        
+        // Click name to switch chart (update activeSymbol)
+        chip.querySelector('.chip-name').addEventListener('click', () => {
+            if (activeSymbol !== s.symbol) {
+                activeSymbol = s.symbol;
+                updateSymbolChips();
+                renderTradingViewWidget();
+            }
+        });
+
+        chip.querySelector('.symbol-chip-del').addEventListener('click', (e) => {
+            e.stopPropagation();
+            removeSymbol(s.symbol);
+        });
+        
+        container.appendChild(chip);
+    });
+}
+
+function renderTradingViewWidget() {
+    // Only render if we are on the chart section
+    const chartSection = document.getElementById('chart-section');
+    if (!chartSection || !chartSection.classList.contains('active')) {
+        return;
+    }
+
+    const container = document.getElementById('tv-widget-inner');
+    if (!container) return;
+
+    // Clear previous widget
+    container.innerHTML = '';
+
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
+    script.async = true;
+
+    // Prepare symbols array for TV widget
+    // The widget always shows the first symbol in the array as active on load.
+    // We sort it just for the widget's view so activeSymbol appears first.
+    const sortedSymbolsForWidget = [
+        ...tvSymbols.filter(s => s.symbol === activeSymbol),
+        ...tvSymbols.filter(s => s.symbol !== activeSymbol)
+    ];
+    const tvFormattedSymbols = sortedSymbolsForWidget.map(s => [s.name || s.symbol.split(':')[1], `${s.symbol}|1D`]);
+
+    const config = {
+        "lineWidth": 2,
+        "lineType": 0,
+        "chartType": "area",
+        "fontColor": "rgb(106, 109, 120)",
+        "gridLineColor": "rgba(242, 242, 242, 0.06)",
+        "volumeUpColor": "rgba(34, 171, 148, 0.5)",
+        "volumeDownColor": "rgba(247, 82, 95, 0.5)",
+        "backgroundColor": "#0F0F0F",
+        "widgetFontColor": "#DBDBDB",
+        "upColor": "#22ab94",
+        "downColor": "#f7525f",
+        "borderUpColor": "#22ab94",
+        "borderDownColor": "#f7525f",
+        "wickUpColor": "#22ab94",
+        "wickDownColor": "#f7525f",
+        "colorTheme": "dark",
+        "isTransparent": false,
+        "locale": "kr",
+        "chartOnly": false,
+        "scalePosition": "right",
+        "scaleMode": "Normal",
+        "fontFamily": "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
+        "valuesTracking": "1",
+        "changeMode": "price-and-percent",
+        "symbols": tvFormattedSymbols,
+        "dateRanges": [
+            "1d|1",
+            "1m|30",
+            "3m|60",
+            "12m|1D",
+            "60m|1W",
+            "all|1M"
+        ],
+        "fontSize": "10",
+        "headerFontSize": "medium",
+        "autosize": true,
+        "width": "80%",
+        "height": "80%",
+        "noTimeScale": false,
+        "hideDateRanges": false,
+        "hideMarketStatus": false,
+        "hideSymbolLogo": false
+    };
+
+    script.innerHTML = JSON.stringify(config);
+    container.appendChild(script);
+    isWidgetRendered = true;
 }

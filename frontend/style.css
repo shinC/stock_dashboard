@@ -203,6 +203,12 @@ tbody tr:hover {
     100% { opacity: 0.5; }
 }
 
+.tradingview-widget-container__widget {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 /* --- Sector Board Styles --- */
 .controls-group {
     display: flex;
@@ -408,4 +414,164 @@ tbody tr:hover {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Chart Section Styles --- */
+.search-container {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto 1rem auto;
+}
+
+#symbol-search-input {
+    width: 100%;
+    padding: 12px 45px 12px 20px;
+    font-size: 1rem;
+    border: 2px solid var(--card-border);
+    border-radius: 9999px;
+    outline: none;
+    transition: all 0.2s ease;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+}
+
+.search-icon {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.search-icon svg {
+    width: 18px;
+    height: 18px;
+    color: var(--text-secondary);
+}
+
+#symbol-search-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-results {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+}
+
+.search-results.active {
+    display: block;
+}
+
+.search-result-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--card-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover, .search-result-item.selected {
+    background: #f3f4f6;
+}
+
+.search-result-symbol {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.search-result-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-left: 10px;
+}
+
+.search-result-exchange {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    color: var(--text-secondary);
+}
+
+.symbol-manager {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.symbol-chip {
+    display: inline-flex;
+    align-items: center;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.symbol-chip.active {
+    background: #fef9c3; /* Light yellow */
+    border-color: #facc15; /* Yellow border */
+    color: #854d0e; /* Dark brown text */
+}
+
+.symbol-chip .chip-name {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.symbol-chip .chip-name:hover {
+    text-decoration: underline;
+}
+
+.symbol-chip-del {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    transition: all 0.2s ease;
+}
+
+.symbol-chip-del:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+/* Centering TradingView Widget */
+#tv-widget-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="dashboard-container">
         <header>
@@ -21,6 +23,7 @@
         <div class="tabs-container">
             <button class="tab-btn active" data-target="us-section">미국 시장</button>
             <button class="tab-btn" data-target="kr-section">한국 시장</button>
+            <button class="tab-btn" data-target="chart-section">미국 종목 차트</button>
         </div>
 
         <section class="market-section" id="us-section">
@@ -28,8 +31,9 @@
             <div class="grid" id="us-market-grid">
                 <!-- Cards injected by JS -->
             </div>
-            
-            <div class="section-header space-between" style="margin-top: 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+
+            <div class="section-header space-between"
+                style="margin-top: 2.5rem; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="margin: 0;">미국 섹터 및 테마 시황</h3>
                 <div class="controls-group">
                     <button id="filter-btn" class="premium-btn">보기 설정 <span class="btn-icon">👁️</span></button>
@@ -52,7 +56,34 @@
                 <!-- Tables injected by JS -->
             </div>
         </section>
+
+        <section class="market-section" id="chart-section">
+            <h2>종목별 차트 검색</h2>
+
+            <div class="search-container">
+                <input type="text" id="symbol-search-input" placeholder="종목명 또는 티커 검색 (예: 애플, TSLA)" autocomplete="off">
+                <span class="search-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </span>
+                <div id="search-results" class="search-results"></div>
+            </div>
+
+            <div class="symbol-manager" id="symbol-chips-container">
+                <!-- Symbol Chips injected by JS -->
+            </div>
+
+            <div class="tradingview-widget-container" id="tv-widget-wrapper"
+                style="height: 600px; width: 100%; margin-top: 2rem;">
+                <div class="tradingview-widget-container__widget" id="tv-widget-inner"
+                    style="height: 100%; width: 100%;"></div>
+            </div>
+        </section>
     </div>
     <script src="app.js"></script>
 </body>
+
 </html>

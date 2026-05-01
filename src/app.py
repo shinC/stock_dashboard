@@ -6,6 +6,8 @@ from us_sector_fetcher import get_us_sectors_data
 import pandas as pd
 import os
 
+import requests
+
 app = Flask(__name__, static_folder='../frontend', static_url_path='/')
 # 프론트엔드와 백엔드가 다른 포트에서 실행될 수 있으므로 CORS 허용
 CORS(app)
@@ -80,6 +82,43 @@ def get_us_sectors():
 def get_themes():
     themes_list = get_leading_themes()
     return jsonify(themes_list)
+
+from flask import request
+
+@app.route('/api/search-symbol', methods=['GET'])
+def search_symbol():
+    query = request.args.get('q', '')
+    if not query:
+        return jsonify([])
+    
+    url = f"https://m.stock.naver.com/front-api/search/autoComplete?query={query}&target=stock,index,marketindicator,coin,ipo,fund"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    }
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            items = []
+            
+            if data.get('isSuccess') and 'result' in data and 'items' in data['result']:
+                # 미국 주식만 필터링 (필요에 따라 해제 가능)
+                items = [item for item in data['result']['items'] if item.get('nationCode') == 'USA']
+                
+            results = []
+            for item in items[:10]:
+                results.append({
+                    'symbol': item.get('code'),
+                    'exchange': item.get('typeCode'),
+                    'description': item.get('name'),
+                    'type': item.get('category')
+                })
+            return jsonify(results)
+        else:
+            return jsonify({"error": f"Failed to fetch from Naver: {response.status_code}"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, port=8080)
