@@ -11,6 +11,7 @@
   - `Finviz` API: 미국 주식 섹터 및 하위 테마 실시간 등락률 데이터 수집
   - 웹 스크래핑/크롤링 (`requests`, `BeautifulSoup` 등): 당일 테마 정보, 상승 테마 갯수, 거래대금 데이터 수집 (네이버 금융 등 활용)
   - TradingView Search API (Backend Proxy): 심볼 검색 (한국어, 영어, 티커 완벽 지원, 자체 사전 불필요)
+  - 네이버 증권 모바일 API: 미국 주식(NYSE, NASDAQ) 상승률/거래대금 순위 데이터 수집 (stockPriceSortType: up/priceTop) (5/3 추가)
 - **Data Processing:** `pandas`, `numpy`
 - **Caching:** `cachetools`, Streamlit 내장 캐싱 (`st.cache_data`)
 - **Environment Management:** `python-dotenv`

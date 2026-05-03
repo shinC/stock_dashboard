@@ -281,6 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderMarket('kr-market', 'kr-market-grid', 'kr');
     renderThemes();
     renderSectorsBoard();
+    initUSTopStocks();
 
     // Event Listeners for Tabs
     const tabBtns = document.querySelectorAll('.tab-btn');
@@ -760,3 +761,189 @@ function renderTradingViewWidget() {
     container.appendChild(script);
     isWidgetRendered = true;
 }
+
+// --- 5/3 추가: 미국 주식 상승률/거래대금 순위 ---
+let topStocksData = [];
+let topStocksSortConfig = { key: 'price', dir: 'desc' }; // default: 현재가(상승률) 내림차순
+let currentUSExchange = 'NASDAQ';
+let currentUSSortType = 'up'; // 'up': 상승률, 'priceTop': 거래대금
+
+function initUSTopStocks() {
+    const exchangeTabs = document.querySelectorAll('.exchange-tab-item');
+    exchangeTabs.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            exchangeTabs.forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentUSExchange = e.target.getAttribute('data-exchange');
+            renderUSTopStocks();
+        });
+    });
+
+    const sortTypeTabs = document.querySelectorAll('.sort-type-btn');
+    sortTypeTabs.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            sortTypeTabs.forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentUSSortType = e.target.getAttribute('data-sort');
+            
+            // 타이틀 텍스트 변경 (옵션)
+            const titleEl = document.querySelector('.us-top-stocks-container h3');
+            if (titleEl) {
+                titleEl.textContent = currentUSSortType === 'up' ? '미국 주식 상승률 순위 (상위 50)' : '미국 주식 거래대금 순위 (상위 50)';
+            }
+            
+            renderUSTopStocks();
+        });
+    });
+
+    const sortHeaders = document.querySelectorAll('#us-top-stocks-table th.sortable');
+    sortHeaders.forEach(th => {
+        th.addEventListener('click', () => {
+            const sortKey = th.getAttribute('data-sort');
+            // Toggle direction
+            if (topStocksSortConfig.key === sortKey) {
+                topStocksSortConfig.dir = topStocksSortConfig.dir === 'desc' ? 'asc' : 'desc';
+            } else {
+                topStocksSortConfig.key = sortKey;
+                topStocksSortConfig.dir = 'desc';
+            }
+            
+            // Update UI icons
+            sortHeaders.forEach(header => {
+                header.classList.remove('asc', 'desc');
+            });
+            th.classList.add(topStocksSortConfig.dir);
+            
+            // Re-render table with sorted data
+            renderUSTopStocksTable();
+        });
+    });
+
+    // Initial render
+    renderUSTopStocks();
+}
+
+async function renderUSTopStocks() {
+    const tbody = document.getElementById('us-top-stocks-tbody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;"><div class="loading-skeleton" style="height:40px; margin-bottom:10px;"></div><div class="loading-skeleton" style="height:40px;"></div></td></tr>';
+
+    try {
+        const res = await fetch(`${API_BASE}/us-top-stocks?exchange=${currentUSExchange}&sort=${currentUSSortType}`);
+        const data = await res.json();
+        
+        if (data && data.result && data.result.stocks) {
+            topStocksData = data.result.stocks;
+            
+            // 기본 정렬: 현재가(상승률) 또는 거래량 헤더에 아이콘 표시
+            const defaultSortKey = currentUSSortType === 'up' ? 'price' : 'volume';
+            topStocksSortConfig = { key: defaultSortKey, dir: 'desc' }; 
+            
+            const sortHeaders = document.querySelectorAll('#us-top-stocks-table th.sortable');
+            sortHeaders.forEach(header => {
+                header.classList.remove('asc', 'desc');
+                if (header.getAttribute('data-sort') === defaultSortKey) {
+                    header.classList.add('desc');
+                }
+            });
+
+            renderUSTopStocksTable();
+        } else {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">데이터를 불러올 수 없습니다.</td></tr>';
+        }
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--down-us);">오류 발생: ${err.message}</td></tr>`;
+    }
+}
+
+function renderUSTopStocksTable() {
+    const tbody = document.getElementById('us-top-stocks-tbody');
+    if (!tbody) return;
+
+    // Data Sort
+    let sortedData = [...topStocksData];
+    
+    sortedData.sort((a, b) => {
+        let valA = 0;
+        let valB = 0;
+        
+        if (topStocksSortConfig.key === 'price') {
+            // 현재가 컬럼 클릭 시 상승률(fluctuationsRatio) 기준으로 정렬
+            valA = parseFloat(a.fluctuationsRatio) || 0;
+            valB = parseFloat(b.fluctuationsRatio) || 0;
+        } else if (topStocksSortConfig.key === 'volume') {
+            if (currentUSSortType === 'priceTop') {
+                // 거래대금 모드일 때는 거래대금(accumulatedTradingValue) 기준으로 정렬
+                valA = parseFloat(a.accumulatedTradingValue) || 0;
+                valB = parseFloat(b.accumulatedTradingValue) || 0;
+            } else {
+                // 그 외에는 거래량(accumulatedTradingVolume) 기준으로 정렬
+                valA = parseFloat(a.accumulatedTradingVolume) || 0;
+                valB = parseFloat(b.accumulatedTradingVolume) || 0;
+            }
+        } else if (topStocksSortConfig.key === 'marketcap') {
+            valA = parseFloat(a.marketValue) || 0;
+            valB = parseFloat(b.marketValue) || 0;
+        }
+
+        if (topStocksSortConfig.dir === 'asc') {
+            return valA - valB;
+        } else {
+            return valB - valA;
+        }
+    });
+
+    tbody.innerHTML = '';
+    
+    sortedData.forEach(item => {
+        const tr = document.createElement('tr');
+        
+        // 종목명/티커
+        const name = item.name || '';
+        const symbol = item.symbolCode || '';
+        
+        // 현재가/등락률
+        const price = parseFloat(item.currentPrice).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        const chgRatio = parseFloat(item.fluctuationsRatio) || 0;
+        const colorClass = chgRatio > 0 ? 'val-pos' : (chgRatio < 0 ? 'val-neg' : 'val-neu');
+        const sign = chgRatio > 0 ? '+' : '';
+        const priceDisplay = `<div style="font-weight:600;">$${price}</div><div class="${colorClass}" style="font-size:0.85rem;">${sign}${chgRatio.toFixed(2)}%</div>`;
+        
+        // 거래량/거래대금 (거래량 우선 표시)
+        const volume = (item.accumulatedTradingVolume || 0).toLocaleString();
+        const value = (parseFloat(item.accumulatedTradingValue || 0) / 10000).toLocaleString(undefined, {maximumFractionDigits:0}); // 만 단위로 축소
+        const volumeDisplay = `<div>${volume} 주</div><div style="font-size:0.8rem; color:var(--text-secondary);">${value} 만 USD</div>`;
+        
+        // 시가총액
+        const mcapStr = item.marketValue ? (parseFloat(item.marketValue) / 100).toLocaleString(undefined, {maximumFractionDigits:0}) + ' 억 USD' : '-'; // 보통 백만 단위
+        
+        // 미니차트 이미지
+        const chartImg = item.miniImageChartUrl ? `<img src="${item.miniImageChartUrl}" class="mini-chart-canvas" alt="차트" loading="lazy">` : '';
+
+        tr.innerHTML = `
+            <td>
+                <div style="font-weight:600;">${name}</div>
+                <div style="font-size:0.8rem; color:var(--text-secondary);">${symbol}</div>
+            </td>
+            <td>${chartImg}</td>
+            <td>${priceDisplay}</td>
+            <td>${volumeDisplay}</td>
+            <td>${mcapStr}</td>
+        `;
+        
+        // 클릭 시 트레이딩뷰 위젯으로 연동 및 페이지 이동
+        tr.addEventListener('click', () => {
+            const exchange = item.stockExchangeType || 'NASDAQ'; // Default fallback
+            addSymbol(name, `${exchange}:${symbol}`);
+            // 스크롤 상단(차트 영역)으로 이동
+            const tvWrapper = document.getElementById('tv-widget-wrapper');
+            if (tvWrapper) {
+                tvWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+        
+        tbody.appendChild(tr);
+    });
+}
+

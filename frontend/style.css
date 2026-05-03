@@ -575,3 +575,128 @@ tbody tr:hover {
     justify-content: center;
     align-items: center;
 }
+
+/* --- 5/3 추가: 미국 주식 상승률 순위 --- */
+.us-top-stocks-container {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.exchange-tabs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.exchange-btn {
+    border-radius: 9999px;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    background: transparent;
+    border: 1px solid var(--card-border);
+}
+
+.exchange-btn.active {
+    background: var(--text-primary);
+    color: #fff;
+    border-color: var(--text-primary);
+}
+
+.premium-table th.sortable {
+    user-select: none;
+    transition: color 0.2s;
+}
+
+.premium-table th.sortable:hover {
+    color: var(--text-primary);
+}
+
+.sort-icon::after {
+    content: " \2195"; /* Up/Down arrow */
+    opacity: 0.3;
+    font-size: 0.9em;
+}
+
+.sortable.asc .sort-icon::after {
+    content: " \2191"; /* Up arrow */
+    opacity: 1;
+    color: var(--text-primary);
+}
+
+.sortable.desc .sort-icon::after {
+    content: " \2193"; /* Down arrow */
+    opacity: 1;
+    color: var(--text-primary);
+}
+
+.premium-table tbody tr {
+    cursor: pointer;
+}
+
+.mini-chart-canvas {
+    width: 100px;
+}
+/* Sort Pill Buttons Style */
+.sort-tabs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.sort-pill-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-secondary);
+    padding: 6px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sort-pill-btn:hover {
+    border-color: #d1d5db;
+    color: var(--text-primary);
+}
+
+.sort-pill-btn.active {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Exchange Tab Style (Segmented Control) */
+.exchange-tabs-row {
+    display: flex;
+    width: 100%;
+    background: #f3f4f6;
+    padding: 4px;
+    border-radius: 12px;
+}
+
+.exchange-tab-item {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 8px 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.exchange-tab-item:hover {
+    color: var(--text-primary);
+}
+
+.exchange-tab-item.active {
+    color: var(--text-primary);
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}

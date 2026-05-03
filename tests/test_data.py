@@ -5,7 +5,7 @@ import os
 # src 폴더를 패스에 추가하여 모듈 임포트 가능하도록 설정
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
-from data_fetcher import get_daily_summary, get_intraday_data
+from data_fetcher import get_daily_summary, get_intraday_data, get_us_top_stocks
 from theme_analyzer import get_leading_themes
 
 class TestDataFetcher(unittest.TestCase):
@@ -26,6 +26,13 @@ class TestDataFetcher(unittest.TestCase):
         self.assertIsNotNone(themes, "Themes dataframe should not be None")
         self.assertFalse(themes.empty, "Themes dataframe is empty")
         self.assertIn('테마명', themes.columns)
+
+    def test_get_us_top_stocks(self):
+        data = get_us_top_stocks(exchange='NASDAQ', sort_type='up')
+        self.assertIsNotNone(data, "US top stocks data should not be None")
+        self.assertIn('result', data)
+        self.assertIn('stocks', data['result'])
+        self.assertGreater(len(data['result']['stocks']), 0, "Stocks list should not be empty")
 
 if __name__ == '__main__':
     unittest.main()

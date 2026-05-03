@@ -81,6 +81,43 @@
                 <div class="tradingview-widget-container__widget" id="tv-widget-inner"
                     style="height: 100%; width: 100%;"></div>
             </div>
+
+            <!-- 5/3 추가: 미국 주식 상승률 순위 -->
+            <div class="us-top-stocks-container" style="margin-top: 3rem;">
+                <div class="section-header space-between" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 style="margin: 0;">미국 주식 상승률 순위 (상위 50)</h3>
+                    <div class="list-controls-container" style="display: flex; gap: 0.75rem; align-items: center;">
+                        <!-- 상단: 상승률/거래대금 버튼 -->
+                        <div class="sort-tabs" id="us-sort-tabs">
+                            <button class="sort-type-btn sort-pill-btn active" data-sort="up">상승률</button>
+                            <button class="sort-type-btn sort-pill-btn" data-sort="priceTop">거래대금</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 하단: 뉴욕/나스닥 탭 (전체 폭 사용) -->
+                <div class="exchange-tabs-row" id="exchange-tabs" style="margin-bottom: 1.5rem;">
+                    <button class="exchange-tab-item active" data-exchange="NASDAQ">NASDAQ</button>
+                    <button class="exchange-tab-item" data-exchange="NYSE">NYSE</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="premium-table" id="us-top-stocks-table">
+                        <thead>
+                            <tr>
+                                <th>종목</th>
+                                <th>차트</th>
+                                <th class="sortable" data-sort="price" style="cursor: pointer;">현재가 <span class="sort-icon"></span></th>
+                                <th class="sortable" data-sort="volume" style="cursor: pointer;">거래량(대금) <span class="sort-icon"></span></th>
+                                <th class="sortable" data-sort="marketcap" style="cursor: pointer;">시가총액 <span class="sort-icon"></span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="us-top-stocks-tbody">
+                            <!-- 로딩 또는 결과 표시 영역 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </section>
     </div>
     <script src="app.js"></script>

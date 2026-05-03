@@ -3,6 +3,7 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
 import cachetools.func
+import requests
 
 # 미국 및 국내 지표 매핑 (yfinance 기준, intraday 용도)
 TICKER_MAP = {
@@ -239,4 +240,19 @@ def get_daily_summary(name: str):
         }
     except Exception as e:
         print(f"Error fetching daily summary for {name}: {e}")
+        return None
+
+@cachetools.func.ttl_cache(maxsize=128, ttl=60)
+def get_us_top_stocks(exchange: str = 'NASDAQ', sort_type: str = 'up'):
+    url = f"https://m.stock.naver.com/front-api/worldstock/exchange/stock/list?stockExchangeType={exchange}&stockPriceSortType={sort_type}&page=1&pageSize=50"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    }
+    try:
+        res = requests.get(url, headers=headers, timeout=5)
+        if res.status_code == 200:
+            return res.json()
+        return None
+    except Exception as e:
+        print(f"Error fetching US top stocks: {e}")
         return None

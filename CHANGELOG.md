@@ -1,8 +1,18 @@
 # Changelog
 
-## [1.0.0] - 2026-04-29
+## [1.1.0] - 2026-05-03
 
 ### Added
+- **미국 주식 상승률 순위 제공 (`src/app.py`, `src/data_fetcher.py`):**
+  - 뉴욕(NYSE) 및 나스닥(NASDAQ) 거래소별 당일 상승률 상위 50개 종목 데이터 수집 API 연동 (네이버 증권 모바일 API 활용).
+  - 프론트엔드 통신을 위한 `/api/us-top-stocks` 엔드포인트 신설.
+- **상승률 순위 UI 및 차트 연동 (`frontend/index.html`, `frontend/app.js`, `frontend/style.css`):**
+  - 미국종목 차트 하단에 상승률 순위 탭(NASDAQ, NYSE) 및 테이블 컨테이너 추가.
+  - 받아온 종목의 미니차트, 현재가, 거래량/거래대금, 시가총액 렌더링 기능 추가.
+  - 테이블 헤더 클릭 시 프론트엔드 레벨에서의 오름차순/내림차순 정렬 기능 구현.
+  - 행 클릭 시 상단 트레이딩뷰 위젯으로 해당 종목 티커가 전달되어 연동되도록 기능 구현.
+
+## [1.0.0] - 2026-04-29
 - **기획/아키텍처 문서화:** `docs/PRD.md`, `docs/ARCH.md` 작성.
 - **의존성 업데이트:** `streamlit`, `yfinance`, `beautifulsoup4`, `FinanceDataReader` 등 대시보드 구동에 필요한 패키지 추가.
 - **데이터 수집 모듈 (`src/data_fetcher.py`):**

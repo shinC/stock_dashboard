@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
-from data_fetcher import get_intraday_data, get_daily_summary, TICKER_MAP
+from data_fetcher import get_intraday_data, get_daily_summary, TICKER_MAP, get_us_top_stocks
 from theme_analyzer import get_leading_themes
 from us_sector_fetcher import get_us_sectors_data
 import pandas as pd
@@ -119,6 +119,16 @@ def search_symbol():
             return jsonify({"error": f"Failed to fetch from Naver: {response.status_code}"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/us-top-stocks', methods=['GET'])
+def us_top_stocks():
+    exchange = request.args.get('exchange', 'NASDAQ')
+    sort_type = request.args.get('sort', 'up')
+    data = get_us_top_stocks(exchange=exchange, sort_type=sort_type)
+    if data:
+        return jsonify(data)
+    else:
+        return jsonify({"error": "Failed to fetch top stocks"}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, port=8080)

@@ -96,3 +96,29 @@
   </script>
 </div>
 <!-- TradingView Widget END -->
+
+
+
+5/3 추가개발
+
+- 미국 주식(뉴욕, 나스닥) 상승률 순위 리스트
+- 개발사항
+  - 뉴욕, 나스닥 탭으로 선택가능
+  - 각 지수별로 상승률 종목 50개씩 보여줘.
+  - sample2.png 참조해서 최대한 유사하게 개발(종목,미니차트,현재가,거래량・대금,시가총액)
+  - 가져온 데이터에서 현재가, 거래량, 시가총액 컬럼은 클릭시 up,down 정렬 가능하게)
+  - UI는 미국종목차트 - 종목별 차트 검색 하단에 테이블 형식으로 
+  - 종목클릭시, 차트랑도 연동되게해줘.
+
+
+- 데이터(네이버 증권)
+  - URL - https://m.stock.naver.com/front-api/worldstock/exchange/stock/list?stockExchangeType=NASDAQ&stockPriceSortType=up&page=1&pageSize=50
+  - 변수 stockExchangeType
+    - NASDAQ,NYSE
+  -stockPriceSortType
+    - up, priceTop
+
+5/3 추가개발2
+  - 5/3 추가개발 건에서 현재는 상승률 기반만 데이터를 가지고 오는데, 거래대금 기반으로도 가지고 올 것.
+  - stockPriceSortType 에서 priceTop 값만 넣으면 기존 상승률기반에서 거래대금 기반으로 가지고 옴.
+  - 버튼을 두어서 거래대금, 상승률 전환 가능하게 해줘.
