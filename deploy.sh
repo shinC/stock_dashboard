@@ -48,8 +48,8 @@ User=$APP_USER
 Group=www-data
 WorkingDirectory=$REPO_DIR
 Environment="PATH=$REPO_DIR/venv/bin"
-# Gunicorn 실행 (src.app:app 모듈 지정, 8080 포트 바인딩)
-ExecStart=$REPO_DIR/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8080 --chdir $REPO_DIR/src app:app
+# Gunicorn 실행 (src.app:app 모듈 지정, gevent 워커로 SSE 지원)
+ExecStart=$REPO_DIR/venv/bin/gunicorn --workers 1 --worker-class gevent --bind 127.0.0.1:8080 --chdir $REPO_DIR/src app:app
 
 [Install]
 WantedBy=multi-user.target
@@ -67,6 +67,11 @@ server {
 
     location / {
         proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Connection '';
+        proxy_buffering off;
+        proxy_cache off;
+        chunked_transfer_encoding off;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;

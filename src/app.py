@@ -1,12 +1,17 @@
-from flask import Flask, jsonify, send_from_directory
+from gevent import monkey
+monkey.patch_all()
+
+from flask import Flask, jsonify, send_from_directory, Response, request
 from flask_cors import CORS
 from data_fetcher import get_intraday_data, get_daily_summary, TICKER_MAP, get_us_top_stocks
 from theme_analyzer import get_leading_themes
 from us_sector_fetcher import get_us_sectors_data
 import pandas as pd
 import os
-
+import json
 import requests
+import gevent
+from gevent.queue import Queue
 
 app = Flask(__name__, static_folder='../frontend', static_url_path='/')
 # 프론트엔드와 백엔드가 다른 포트에서 실행될 수 있으므로 CORS 허용
@@ -68,11 +73,64 @@ def fetch_market_data(indices):
 
 @app.route('/api/us-market', methods=['GET'])
 def get_us_market():
+    # 폴백용, 혹은 초기 로딩시 사용
+    if market_data_cache.get('us'):
+        return jsonify(market_data_cache['us'])
     return jsonify(fetch_market_data(US_INDICES))
 
 @app.route('/api/kr-market', methods=['GET'])
 def get_kr_market():
+    # 폴백용, 혹은 초기 로딩시 사용
+    if market_data_cache.get('kr'):
+        return jsonify(market_data_cache['kr'])
     return jsonify(fetch_market_data(KR_INDICES))
+
+# ==========================================
+# SSE / Background Job (5/4 수정사항 반영)
+# ==========================================
+clients = []
+market_data_cache = {"us": None, "kr": None}
+
+def background_fetch_loop():
+    while True:
+        try:
+            us_data = fetch_market_data(US_INDICES)
+            kr_data = fetch_market_data(KR_INDICES)
+            market_data_cache['us'] = us_data
+            market_data_cache['kr'] = kr_data
+            
+            payload = json.dumps({"us": us_data, "kr": kr_data})
+            # 브로드캐스트
+            for q in clients:
+                q.put(payload)
+        except Exception as e:
+            print(f"Error in background fetch loop: {e}")
+            
+        # 2분 주기
+        gevent.sleep(120)
+
+# 앱 로드 시 백그라운드 태스크 시작
+gevent.spawn(background_fetch_loop)
+
+def stream_events():
+    q = Queue()
+    clients.append(q)
+    try:
+        # 연결 즉시 현재 캐시된 데이터 전송
+        if market_data_cache.get('us') and market_data_cache.get('kr'):
+            yield f"data: {json.dumps(market_data_cache)}\n\n"
+            
+        while True:
+            # 새로운 데이터가 들어올 때까지 대기
+            payload = q.get()
+            yield f"data: {payload}\n\n"
+    except GeneratorExit:
+        clients.remove(q)
+
+@app.route('/api/stream')
+def stream():
+    return Response(stream_events(), mimetype="text/event-stream")
+
 
 @app.route('/api/us-sectors', methods=['GET'])
 def get_us_sectors():
@@ -82,8 +140,6 @@ def get_us_sectors():
 def get_themes():
     themes_list = get_leading_themes()
     return jsonify(themes_list)
-
-from flask import request
 
 @app.route('/api/search-symbol', methods=['GET'])
 def search_symbol():
@@ -131,4 +187,7 @@ def us_top_stocks():
         return jsonify({"error": "Failed to fetch top stocks"}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=8080)
+    from gevent.pywsgi import WSGIServer
+    print("Starting gevent WSGIServer on port 8080...")
+    http_server = WSGIServer(('0.0.0.0', 8080), app)
+    http_server.serve_forever()

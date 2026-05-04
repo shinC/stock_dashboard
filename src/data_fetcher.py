@@ -21,7 +21,42 @@ TICKER_MAP = {
     'KOSDAQ 150': '^KQ150',
 }
 
-@cachetools.func.ttl_cache(maxsize=128, ttl=300)
+def get_naver_index_summary(symbol):
+    """네이버 실시간 API를 통해 국내 지수 요약 정보를 가져옵니다."""
+    url = f"https://polling.finance.naver.com/api/realtime?query=SERVICE_INDEX:{symbol}"
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    try:
+        res = requests.get(url, headers=headers, timeout=5)
+        if res.status_code == 200:
+            data = res.json()
+            if data.get('resultCode') == 'success':
+                datas = data['result']['areas'][0]['datas']
+                target = next((item for item in datas if item['cd'] == symbol), None)
+                if target:
+                    # Naver API의 nv, cv 값은 100이 곱해진 정수 형태로 오는 경우가 많음
+                    close = float(target['nv']) / 100.0
+                    open_val = float(target['ov']) / 100.0
+                    change_val = float(target['cv']) / 100.0
+                    # rf: 2 (상승), 3 (보합), 5 (하락)
+                    if target['rf'] == '5':
+                        prev_close = close + change_val
+                    else:
+                        prev_close = close - change_val
+                        
+                    return {
+                        'name': symbol,
+                        'open': open_val,
+                        'close': close,
+                        'prev_close': prev_close,
+                        'change_pct': float(target['cr'])
+                    }
+        return None
+    except Exception as e:
+        print(f"Error fetching Naver index summary for {symbol}: {e}")
+        return None
+
+
+@cachetools.func.ttl_cache(maxsize=128, ttl=60)
 def get_intraday_data(name: str):
     """
     주어진 지표의 가장 최근 '1거래일' 동안의 흐름(15분 단위)을 가져옵니다.
@@ -48,123 +83,42 @@ def get_intraday_data(name: str):
         else:
             close_col = 'Close'
             
-        # 한국 시장과 미국 시장의 마감 시간 기준 설정
-        if name in ['KOSPI', 'KOSDAQ', 'KOSPI 200', 'KOSDAQ 150']:
-            # 한국 시장: 오늘 오후 3시 45분 이전이면 전일 데이터를 보여줌
-            market_close_today = now.replace(hour=15, minute=45, second=0, microsecond=0)
-            if now < market_close_today:
-                # 오늘 날짜를 제외한 가장 최근 날짜 찾기
-                today_date = now.date()
-                df_past = df[df.index.date < today_date]
-                if df_past.empty: return pd.Series(dtype=float)
-                latest_date = df_past.index.date[-1]
+        # 5/4 수정사항: 실시간 차트를 위해 마지막 데이터(현재 종가) 기준 8시간치 (5분봉 기준 96개) 연속 표시
+        df_latest = df.iloc[-96:].copy()
+        
+        # 국내 지수의 경우 장중(09:00 ~ 15:35)에만 실시간 현재가를 마지막에 강제 삽입하여 '라이브' 느낌 제공
+        if name in ['KOSPI', 'KOSDAQ']:
+            now_kst = datetime.now(df.index.tz).replace(microsecond=0)
+            is_market_open = (now_kst.hour == 9 and now_kst.minute >= 0) or (9 < now_kst.hour < 15) or (now_kst.hour == 15 and now_kst.minute <= 35)
+            
+            if is_market_open:
+                summary = get_naver_index_summary(name)
+                if summary:
+                    # 마지막 데이터가 현재 시각과 1분 이상 차이날 경우 새로 추가
+                    if (now_kst - df_latest.index[-1]).total_seconds() > 60:
+                        new_row = pd.DataFrame({close_col: [summary['close']]}, index=[now_kst])
+                        df_latest = pd.concat([df_latest, new_row])
+                        df_latest = df_latest.sort_index().iloc[-96:]
             else:
-                latest_date = df.index.date[-1]
-            df_latest = df[df.index.date == latest_date].copy()
-            
-            # 마감 시간 보정 (15:30)
-            # yfinance가 종가 데이터를 14:55까지만 제공하는 경우가 있으므로, 마지막 데이터 포인트를 15:30으로 고정
-            if not df_latest.empty:
-                last_idx = df_latest.index[-1]
-                if 14 <= last_idx.hour <= 16:
-                    new_idx = last_idx.replace(hour=15, minute=30)
-                    df_latest.index = df_latest.index.delete(-1).insert(len(df_latest)-1, new_idx)
-        elif name == 'WTI':
-            # 유가는 23시간 거래 (한국시간 07:00 ~ 익일 06:00)
-            df_close_window = df[df.index.hour.isin([5, 6, 7])]
-            if not df_close_window.empty:
-                last_in_window = df_close_window.index[-1]
-                
-                market_close_limit = now.replace(hour=6, minute=30, second=0, microsecond=0)
-                if now.hour < 11 and now < market_close_limit:
-                    df_close_window = df_close_window[df_close_window.index < now.replace(hour=0, minute=0)]
-                    if not df_close_window.empty:
-                        last_in_window = df_close_window.index[-1]
-                
-                if 3 <= last_in_window.month <= 11:
-                    end_dt = last_in_window.replace(hour=6, minute=0, second=0)
-                else:
-                    end_dt = last_in_window.replace(hour=7, minute=0, second=0)
-            else:
-                end_dt = df.index[-1]
-            
-            start_dt = end_dt - timedelta(hours=23)
-            df_latest = df[(df.index >= start_dt) & (df.index <= end_dt)].copy()
-            
-            if not df_latest.empty:
-                last_idx = df_latest.index[-1]
-                if last_idx.hour == 5 or (last_idx.hour == 6 and last_idx.minute < 30):
-                    new_idx = last_idx.replace(hour=6, minute=0)
-                    df_latest.index = df_latest.index.delete(-1).insert(len(df_latest)-1, new_idx)
-
-        elif name == 'VIX':
-            # VIX 정규장 마감 (한국시간 05:15 / 겨울 06:15)
-            df_close_window = df[df.index.hour.isin([4, 5, 6, 7])]
-            if not df_close_window.empty:
-                last_in_window = df_close_window.index[-1]
-                
-                market_close_limit = now.replace(hour=6, minute=45, second=0, microsecond=0)
-                if now.hour < 11 and now < market_close_limit:
-                    df_close_window = df_close_window[df_close_window.index < now.replace(hour=0, minute=0)]
-                    if not df_close_window.empty:
-                        last_in_window = df_close_window.index[-1]
-                
-                if 3 <= last_in_window.month <= 11:
-                    end_dt = last_in_window.replace(hour=5, minute=15, second=0)
-                else:
-                    end_dt = last_in_window.replace(hour=6, minute=15, second=0)
-            else:
-                end_dt = df.index[-1]
-            
-            # 정규장 6시간 45분
-            start_dt = end_dt - timedelta(hours=6, minutes=45)
-            df_latest = df[(df.index >= start_dt) & (df.index <= end_dt)].copy()
-            
-            if not df_latest.empty:
-                last_idx = df_latest.index[-1]
-                if last_idx.hour == 5 or (last_idx.hour == 6 and last_idx.minute < 45):
-                    new_idx = last_idx.replace(hour=end_dt.hour, minute=15)
-                    df_latest.index = df_latest.index.delete(-1).insert(len(df_latest)-1, new_idx)
-
-        else:
-            # 미국 지수(나스닥 등) 정규장 마감 (05:00 / 06:00)
-            df_close_window = df[df.index.hour.isin([4, 5, 6])]
-            if not df_close_window.empty:
-                last_in_window = df_close_window.index[-1]
-                
-                market_close_limit = now.replace(hour=6, minute=30, second=0, microsecond=0)
-                if now.hour < 10 and now < market_close_limit:
-                    df_close_window = df_close_window[df_close_window.index < now.replace(hour=0, minute=0)]
-                    if not df_close_window.empty:
-                        last_in_window = df_close_window.index[-1]
-                
-                if 3 <= last_in_window.month <= 11:
-                    end_dt = last_in_window.replace(hour=5, minute=0, second=0)
-                else:
-                    end_dt = last_in_window.replace(hour=6, minute=0, second=0)
-            else:
-                end_dt = df.index[-1]
-            
-            # 정규장 6시간 30분
-            start_dt = end_dt - timedelta(hours=6, minutes=30)
-            df_latest = df[(df.index >= start_dt) & (df.index <= end_dt)].copy()
-            
-            # 마감 시각 보정
-            if not df_latest.empty:
-                last_idx = df_latest.index[-1]
-                if last_idx.hour == 4 or (last_idx.hour == 5 and last_idx.minute < 30):
-                    new_idx = last_idx.replace(hour=5, minute=0)
-                    df_latest.index = df_latest.index.delete(-1).insert(len(df_latest)-1, new_idx)
-                elif last_idx.hour == 5 or (last_idx.hour == 6 and last_idx.minute < 30):
-                    new_idx = last_idx.replace(hour=6, minute=0)
-                    df_latest.index = df_latest.index.delete(-1).insert(len(df_latest)-1, new_idx)
+                # 장 마감 이후에는 Naver 요약의 종가 데이터를 가져오되, 시간을 마지막 거래일의 15:30으로 고정하여 삽입
+                summary = get_naver_index_summary(name)
+                if summary:
+                    # 마지막 데이터의 날짜를 기준으로 15:30 설정 (주말/공휴일 대응)
+                    last_ts = df_latest.index[-1]
+                    market_close_time = last_ts.replace(hour=15, minute=30, second=0, microsecond=0)
+                    
+                    # 만약 마지막 데이터가 이미 15:30 이후라면(드문 경우) 추가하지 않음
+                    if last_ts < market_close_time:
+                        new_row = pd.DataFrame({close_col: [summary['close']]}, index=[market_close_time])
+                        df_latest = pd.concat([df_latest, new_row])
+                        df_latest = df_latest.sort_index().iloc[-96:]
         
         return df_latest[close_col]
     except Exception as e:
         print(f"Error fetching chart data for {name}: {e}")
         return pd.Series(dtype=float)
 
-@cachetools.func.ttl_cache(maxsize=128, ttl=300)
+@cachetools.func.ttl_cache(maxsize=128, ttl=60)
 def get_daily_summary(name: str):
     """
     FinanceDataReader 및 yfinance를 사용하여 '최근 완료된 종가' 기준 요약을 구합니다.
@@ -177,17 +131,20 @@ def get_daily_summary(name: str):
         from datetime import datetime, timedelta
         import pandas as pd
         
+        if name in ['KOSPI', 'KOSDAQ']:
+            summary = get_naver_index_summary(name)
+            if summary:
+                return summary
+            # 실패 시 기존 fdr/yfinance 로직으로 fallback (아래 기존 코드 유지)
+            
         if name in ['KOSPI', 'KOSDAQ', 'KOSPI 200', 'KOSDAQ 150']:
             fdr_map = {'KOSPI': 'KS11', 'KOSDAQ': 'KQ11', 'KOSPI 200': 'KS200', 'KOSDAQ 150': 'KQ150'}
             df = fdr.DataReader(fdr_map.get(name))
             if df.empty or len(df) < 3: return None
             
-            # 한국 시장: 15:45 이전이면 아직 거래중이거나 마감 전으로 간주하여 전일 데이터 사용
+            # 한국 시장: 실시간 업데이트를 위해 현재 날짜 허용
             now_kst = datetime.now(pytz.timezone('Asia/Seoul'))
-            if now_kst.time() < datetime.strptime("15:45", "%H:%M").time():
-                max_final_date = now_kst.date() - timedelta(days=1)
-            else:
-                max_final_date = now_kst.date()
+            max_final_date = now_kst.date()
                 
             max_final_ts = pd.Timestamp(max_final_date)
             if df.index.tz is not None:
@@ -210,12 +167,9 @@ def get_daily_summary(name: str):
             else:
                 close_col, open_col = 'Close', 'Open'
 
-            # 미국 시장: 뉴욕 시간 기준 16:00 이전이면 아직 거래중이거나 마감 전으로 간주
+            # 미국 시장: 실시간 업데이트를 위해 현재 날짜 허용
             now_ny = datetime.now(pytz.timezone('America/New_York'))
-            if now_ny.time() < datetime.strptime("16:00", "%H:%M").time():
-                max_final_date = now_ny.date() - timedelta(days=1)
-            else:
-                max_final_date = now_ny.date()
+            max_final_date = now_ny.date()
                 
             max_final_ts = pd.Timestamp(max_final_date)
             if df.index.tz is not None:

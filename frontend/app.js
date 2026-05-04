@@ -143,31 +143,43 @@ function generateCard(item, index, prefix) {
     `;
 }
 
-// Render market grid
-async function renderMarket(endpoint, containerId, prefix) {
+// Update market grid with provided data
+function updateMarketGrid(containerId, prefix, data) {
     const container = document.getElementById(containerId);
-    try {
-        container.innerHTML = Array(4).fill('<div class="loading-skeleton"></div>').join('');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    data.forEach((item, index) => {
+        container.innerHTML += generateCard(item, index, prefix);
+    });
 
-        const res = await fetch(`${API_BASE}/${endpoint}`);
-        const data = await res.json();
+    // Initialize charts after DOM update
+    data.forEach((item, index) => {
+        if (item.chart && item.chart.length > 0 && item.summary) {
+            const colorSuffix = item.summary.change_pct > 0 ? 'up' : item.summary.change_pct < 0 ? 'down' : 'neutral';
+            const colorClass = colorSuffix === 'neutral' ? 'neutral' : `${colorSuffix}-${prefix}`;
+            createMiniChart(`chart-${prefix}-${index}`, item.chart, colorClass);
+        }
+    });
+}
 
-        container.innerHTML = '';
-        data.forEach((item, index) => {
-            container.innerHTML += generateCard(item, index, prefix);
-        });
-
-        // Initialize charts after DOM update
-        data.forEach((item, index) => {
-            if (item.chart && item.chart.length > 0 && item.summary) {
-                const colorSuffix = item.summary.change_pct > 0 ? 'up' : item.summary.change_pct < 0 ? 'down' : 'neutral';
-                const colorClass = colorSuffix === 'neutral' ? 'neutral' : `${colorSuffix}-${prefix}`;
-                createMiniChart(`chart-${prefix}-${index}`, item.chart, colorClass);
-            }
-        });
-    } catch (err) {
-        container.innerHTML = `<p style="color:var(--accent-down)">데이터를 불러오는 데 실패했습니다: ${err.message}. 백엔드 서버를 확인해주세요.</p>`;
-    }
+// 5/4 수정사항: 실시간 브로드캐스트 (SSE) 수신 초기화
+function initRealtimeStream() {
+    const eventSource = new EventSource(`${API_BASE}/stream`);
+    
+    eventSource.onmessage = function(event) {
+        try {
+            const data = JSON.parse(event.data);
+            if (data.us) updateMarketGrid('us-market-grid', 'us', data.us);
+            if (data.kr) updateMarketGrid('kr-market-grid', 'kr', data.kr);
+        } catch (e) {
+            console.error("Error parsing stream data:", e);
+        }
+    };
+    
+    eventSource.onerror = function(err) {
+        console.error("EventSource failed:", err);
+    };
 }
 
 // Render Themes
@@ -277,8 +289,8 @@ async function renderThemes() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    renderMarket('us-market', 'us-market-grid', 'us');
-    renderMarket('kr-market', 'kr-market-grid', 'kr');
+    // 5/4 수정사항: 기존 renderMarket 일회성 폴링을 실시간 SSE 스트림 연결로 대체
+    initRealtimeStream();
     renderThemes();
     renderSectorsBoard();
     initUSTopStocks();
