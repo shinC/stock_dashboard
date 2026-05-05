@@ -83,9 +83,16 @@ def get_intraday_data(name: str):
         else:
             close_col = 'Close'
             
-        # 5/4 수정사항: 실시간 차트를 위해 마지막 데이터(현재 종가) 기준 8시간치 (5분봉 기준 96개) 연속 표시
-        df_latest = df.iloc[-96:].copy()
-        
+        # 5/5 수정사항: 실시간 차트를 위해 마지막 거래일(하루치) 데이터만 추출
+        # 시간 간격이 2시간 이상 나는 구간을 찾아 새로운 세션의 시작으로 간주
+        time_diffs = df.index.to_series().diff()
+        session_starts = time_diffs > pd.Timedelta(hours=2)
+        if session_starts.any():
+            last_session_start_idx = session_starts[session_starts].index[-1]
+            df_latest = df.loc[last_session_start_idx:].copy()
+        else:
+            df_latest = df.copy()
+            
         # 국내 지수의 경우 장중(09:00 ~ 15:35)에만 실시간 현재가를 마지막에 강제 삽입하여 '라이브' 느낌 제공
         if name in ['KOSPI', 'KOSDAQ']:
             now_kst = datetime.now(df.index.tz).replace(microsecond=0)
@@ -96,22 +103,35 @@ def get_intraday_data(name: str):
                 if summary:
                     # 마지막 데이터가 현재 시각과 1분 이상 차이날 경우 새로 추가
                     if (now_kst - df_latest.index[-1]).total_seconds() > 60:
-                        new_row = pd.DataFrame({close_col: [summary['close']]}, index=[now_kst])
-                        df_latest = pd.concat([df_latest, new_row])
-                        df_latest = df_latest.sort_index().iloc[-96:]
+                        df_latest.loc[now_kst, close_col] = summary['close']
+                        df_latest = df_latest.sort_index()
             else:
-                # 장 마감 이후에는 Naver 요약의 종가 데이터를 가져오되, 시간을 마지막 거래일의 15:30으로 고정하여 삽입
+                # 장 마감 이후에는 Naver 요약의 공식 종가 데이터로 15:30 데이터를 덮어쓰거나 추가함
                 summary = get_naver_index_summary(name)
                 if summary:
                     # 마지막 데이터의 날짜를 기준으로 15:30 설정 (주말/공휴일 대응)
                     last_ts = df_latest.index[-1]
                     market_close_time = last_ts.replace(hour=15, minute=30, second=0, microsecond=0)
                     
-                    # 만약 마지막 데이터가 이미 15:30 이후라면(드문 경우) 추가하지 않음
-                    if last_ts < market_close_time:
-                        new_row = pd.DataFrame({close_col: [summary['close']]}, index=[market_close_time])
-                        df_latest = pd.concat([df_latest, new_row])
-                        df_latest = df_latest.sort_index().iloc[-96:]
+                    df_latest.loc[market_close_time, close_col] = summary['close']
+                    df_latest = df_latest.sort_index()
+        else:
+            # 미국 지수의 경우, 시작 시간(22:30)은 그대로 두되, 장 마감 종가 지점을 정확히 표기하기 위해 끝 점 추가
+            last_ts = df_latest.index[-1]
+            now_kst = datetime.now(df.index.tz).replace(microsecond=0)
+            
+            if (now_kst - last_ts).total_seconds() >= 300:
+                # 마지막 5분봉이 확정된 시점(5분 이상 경과)이면, 5분 뒤의 점을 찍어 해당 봉의 마감 지점(예: 05:00)을 생성
+                expected_close_time = last_ts + pd.Timedelta(minutes=5)
+                summary = get_daily_summary(name)
+                final_close = summary['close'] if summary else df_latest.loc[last_ts, close_col]
+                df_latest.loc[expected_close_time, close_col] = final_close
+                df_latest = df_latest.sort_index()
+            else:
+                # 장중 라이브 상태일 경우 현재 시각으로 점을 연장
+                if (now_kst - last_ts).total_seconds() > 60:
+                    df_latest.loc[now_kst, close_col] = df_latest.loc[last_ts, close_col]
+                    df_latest = df_latest.sort_index()
         
         return df_latest[close_col]
     except Exception as e:
