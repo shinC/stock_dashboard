@@ -145,6 +145,8 @@ function generateCard(item, index, prefix) {
 
 // Update market grid with provided data
 function updateMarketGrid(containerId, prefix, data) {
+    if (!data || data.length === 0) return;
+    
     const container = document.getElementById(containerId);
     if (!container) return;
     
@@ -163,32 +165,72 @@ function updateMarketGrid(containerId, prefix, data) {
     });
 }
 
+// 5/6 추가: 초기 데이터 즉시 로딩 (REST API)
+async function fetchInitialMarketData() {
+    const ts = Date.now();
+    console.log(`[${ts}] fetchInitialMarketData START`);
+    const usGrid = document.getElementById('us-market-grid');
+    const krGrid = document.getElementById('kr-market-grid');
+    
+    if (usGrid) usGrid.innerHTML = '<div class="loading-skeleton" style="height:200px; grid-column:1/-1;"></div>';
+    if (krGrid) krGrid.innerHTML = '<div class="loading-skeleton" style="height:200px; grid-column:1/-1;"></div>';
+
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+        // 캐시 방지를 위해 타임스탬프 추가
+        const [usRes, krRes] = await Promise.all([
+            fetch(`${API_BASE}/us-market?t=${ts}`, { signal: controller.signal }),
+            fetch(`${API_BASE}/kr-market?t=${ts}`, { signal: controller.signal })
+        ]);
+        
+        clearTimeout(timeoutId);
+        
+        const usData = await usRes.json();
+        const krData = await krRes.json();
+        
+        console.log(`[${ts}] fetchInitialMarketData SUCCESS`, { us: usData?.length, kr: krData?.length });
+        
+        if (usData && usData.length > 0) updateMarketGrid('us-market-grid', 'us', usData);
+        if (krData && krData.length > 0) updateMarketGrid('kr-market-grid', 'kr', krData);
+    } catch (err) {
+        console.error(`[${ts}] fetchInitialMarketData FAILED:`, err);
+    }
+}
+
 // 5/4 수정사항: 실시간 브로드캐스트 (SSE) 수신 초기화
 function initRealtimeStream() {
+    console.log("Connecting to SSE stream...");
     const eventSource = new EventSource(`${API_BASE}/stream`);
     
     eventSource.onmessage = function(event) {
         try {
             const data = JSON.parse(event.data);
-            if (data.us) updateMarketGrid('us-market-grid', 'us', data.us);
-            if (data.kr) updateMarketGrid('kr-market-grid', 'kr', data.kr);
+            console.log("SSE received:", data.type || "update");
+            
+            // 데이터가 있을 때만 업데이트 (초기 캐시가 비어있을 수 있음)
+            if (data.us && data.us.length > 0) updateMarketGrid('us-market-grid', 'us', data.us);
+            if (data.kr && data.kr.length > 0) updateMarketGrid('kr-market-grid', 'kr', data.kr);
         } catch (e) {
             console.error("Error parsing stream data:", e);
         }
     };
     
     eventSource.onerror = function(err) {
-        console.error("EventSource failed:", err);
+        console.error("EventSource failed, retrying in 5s...", err);
+        eventSource.close();
+        setTimeout(initRealtimeStream, 5000);
     };
 }
 
 // Render Themes
 async function renderThemes() {
+    const ts = Date.now();
     const container = document.querySelector('#themes-container');
     try {
         container.innerHTML = `<div class="loading-skeleton" style="height:100px;"></div>`;
-
-        const res = await fetch(`${API_BASE}/themes`);
+        const res = await fetch(`${API_BASE}/themes?t=${ts}`);
         const data = await res.json();
 
         container.innerHTML = '';
@@ -288,9 +330,15 @@ async function renderThemes() {
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    // 5/4 수정사항: 기존 renderMarket 일회성 폴링을 실시간 SSE 스트림 연결로 대체
-    initRealtimeStream();
+document.addEventListener('DOMContentLoaded', async () => {
+    // 5/6 수정사항: REST API 호출을 먼저 완료하거나 병행하여 초기 로딩 속도 극대화
+    await fetchInitialMarketData();
+    
+    // 약간의 지연 후 SSE 연결 (HTTP/1.1 연결 제한 우회 목적)
+    setTimeout(() => {
+        initRealtimeStream();
+    }, 500);
+    
     renderThemes();
     renderSectorsBoard();
     initUSTopStocks();
@@ -386,8 +434,9 @@ async function renderSectorsBoard() {
     // Fetch data if not cached
     if (cachedSectors.length === 0) {
         try {
+            const ts = Date.now();
             container.innerHTML = '<div class="loading-skeleton" style="grid-column: 1 / -1;"></div>';
-            const res = await fetch(`${API_BASE}/us-sectors`);
+            const res = await fetch(`${API_BASE}/us-sectors?t=${ts}`);
             cachedSectors = await res.json();
         } catch (err) {
             container.innerHTML = `<p style="color:var(--accent-down); grid-column: 1 / -1;">섹터 데이터를 불러오는 데 실패했습니다.</p>`;
@@ -842,7 +891,8 @@ async function renderUSTopStocks() {
     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;"><div class="loading-skeleton" style="height:40px; margin-bottom:10px;"></div><div class="loading-skeleton" style="height:40px;"></div></td></tr>';
 
     try {
-        const res = await fetch(`${API_BASE}/us-top-stocks?exchange=${currentUSExchange}&sort=${currentUSSortType}`);
+        const ts = Date.now();
+        const res = await fetch(`${API_BASE}/us-top-stocks?exchange=${currentUSExchange}&sort=${currentUSSortType}&t=${ts}`);
         const data = await res.json();
         
         if (data && data.result && data.result.stocks) {

@@ -38,52 +38,62 @@ DISPLAY_NAME_TO_KEY = {
     '코스닥': 'KOSDAQ'
 }
 
-def fetch_market_data(indices):
-    results = []
+def fetch_single_market(display_name):
+    key_name = DISPLAY_NAME_TO_KEY.get(display_name, display_name)
+    summary = get_daily_summary(key_name)
+    chart_data = get_intraday_data(key_name)
     
-    for display_name in indices:
-        key_name = DISPLAY_NAME_TO_KEY.get(display_name, display_name)
-        summary = get_daily_summary(key_name)
-        chart_data = get_intraday_data(key_name)
-        
-        # 차트 데이터를 JSON 직렬화 가능하도록 리스트 딕셔너리로 변환
-        chart_list = []
-        if chart_data is not None and not chart_data.empty:
-            df_chart = chart_data.reset_index()
-            if len(df_chart.columns) >= 2:
-                time_col = df_chart.columns[0]
-                val_col = df_chart.columns[1]
-                for _, row in df_chart.iterrows():
-                    if pd.notnull(row[val_col]):
-                        chart_list.append({
-                            "time": str(row[time_col]),
-                            "value": float(row[val_col])
-                        })
-                
-                # 공식 종가 데이터 추가 (마지막 포인트의 값을 공식 종가로 보정하여 정확도 100% 보장)
-                if summary and len(chart_list) > 0:
-                    chart_list[-1]["value"] = summary['close']
-        
-        results.append({
-            "name": display_name,
-            "summary": summary,
-            "chart": chart_list
-        })
-    return results
+    # 차트 데이터를 JSON 직렬화 가능하도록 리스트 딕셔너리로 변환
+    chart_list = []
+    if chart_data is not None and not chart_data.empty:
+        df_chart = chart_data.reset_index()
+        if len(df_chart.columns) >= 2:
+            time_col = df_chart.columns[0]
+            val_col = df_chart.columns[1]
+            for _, row in df_chart.iterrows():
+                if pd.notnull(row[val_col]):
+                    chart_list.append({
+                        "time": str(row[time_col]),
+                        "value": float(row[val_col])
+                    })
+            
+            # 공식 종가 데이터 추가 (마지막 포인트의 값을 공식 종가로 보정하여 정확도 100% 보장)
+            if summary and len(chart_list) > 0:
+                chart_list[-1]["value"] = summary['close']
+    
+    return {
+        "name": display_name,
+        "summary": summary,
+        "chart": chart_list
+    }
+
+def fetch_market_data(indices):
+    # gevent를 사용하여 병렬로 데이터 수집 (속도 대폭 개선)
+    threads = [gevent.spawn(fetch_single_market, name) for name in indices]
+    gevent.joinall(threads)
+    return [t.value for t in threads if t.value is not None]
 
 @app.route('/api/us-market', methods=['GET'])
 def get_us_market():
-    # 폴백용, 혹은 초기 로딩시 사용
+    # 캐시가 있으면 즉시 반환, 없으면 즉시 수집 시작 (최대 5초 대기)
     if market_data_cache.get('us'):
         return jsonify(market_data_cache['us'])
-    return jsonify(fetch_market_data(US_INDICES))
+    
+    # 캐시가 없을 때만 실시간 수집 수행 (병렬 처리로 약 2초 소요)
+    data = fetch_market_data(US_INDICES)
+    if data:
+        market_data_cache['us'] = data
+    return jsonify(data or [])
 
 @app.route('/api/kr-market', methods=['GET'])
 def get_kr_market():
-    # 폴백용, 혹은 초기 로딩시 사용
     if market_data_cache.get('kr'):
         return jsonify(market_data_cache['kr'])
-    return jsonify(fetch_market_data(KR_INDICES))
+    
+    data = fetch_market_data(KR_INDICES)
+    if data:
+        market_data_cache['kr'] = data
+    return jsonify(data or [])
 
 # ==========================================
 # SSE / Background Job (5/4 수정사항 반영)
@@ -92,21 +102,31 @@ clients = []
 market_data_cache = {"us": None, "kr": None}
 
 def background_fetch_loop():
+    # 초기 실행 시 즉시 한 번 수행하여 캐시 채움
+    print("Initial background fetch started...")
     while True:
         try:
-            us_data = fetch_market_data(US_INDICES)
-            kr_data = fetch_market_data(KR_INDICES)
-            market_data_cache['us'] = us_data
-            market_data_cache['kr'] = kr_data
+            # US와 KR 데이터를 병렬로 가져옴
+            t1 = gevent.spawn(fetch_market_data, US_INDICES)
+            t2 = gevent.spawn(fetch_market_data, KR_INDICES)
+            gevent.joinall([t1, t2])
             
-            payload = json.dumps({"us": us_data, "kr": kr_data})
-            # 브로드캐스트
-            for q in clients:
-                q.put(payload)
+            us_data = t1.value
+            kr_data = t2.value
+            
+            if us_data and kr_data:
+                market_data_cache['us'] = us_data
+                market_data_cache['kr'] = kr_data
+                
+                payload = json.dumps({"us": us_data, "kr": kr_data})
+                # 브로드캐스트
+                for q in clients:
+                    q.put(payload)
+                print("Market data cache updated and broadcasted.")
         except Exception as e:
             print(f"Error in background fetch loop: {e}")
             
-        # 2분 주기
+        # 2분 주기 (실제 운영 환경에서는 주기를 조절할 수 있음)
         gevent.sleep(120)
 
 # 앱 로드 시 백그라운드 태스크 시작
@@ -116,16 +136,18 @@ def stream_events():
     q = Queue()
     clients.append(q)
     try:
-        # 연결 즉시 현재 캐시된 데이터 전송
-        if market_data_cache.get('us') and market_data_cache.get('kr'):
-            yield f"data: {json.dumps(market_data_cache)}\n\n"
+        # 5/6 보완: 연결 즉시 "연결됨" 신호와 현재 캐시된 데이터가 있다면 즉시 전송
+        # Nginx 버퍼링을 밀어내기 위해 초기 데이터를 확실히 보냄
+        initial_data = {"type": "connected", "us": market_data_cache.get('us'), "kr": market_data_cache.get('kr')}
+        yield f"data: {json.dumps(initial_data)}\n\n"
             
         while True:
             # 새로운 데이터가 들어올 때까지 대기
             payload = q.get()
             yield f"data: {payload}\n\n"
     except GeneratorExit:
-        clients.remove(q)
+        if q in clients:
+            clients.remove(q)
 
 @app.route('/api/stream')
 def stream():
