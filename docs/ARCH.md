@@ -14,25 +14,29 @@
   - 네이버 증권 모바일 API: 미국 주식(NYSE, NASDAQ) 상승률/거래대금 순위 데이터 수집 (stockPriceSortType: up/priceTop) (5/3 추가)
 - **Data Processing:** `pandas`, `numpy`
 - **Caching:** `cachetools`, Streamlit 내장 캐싱 (`st.cache_data`)
-- **Environment Management:** `python-dotenv`
+- **Environment Management:** `python-dotenv`, `venv` (상세 내용은 [ENV.md](file:///Users/taeheonshin/dev/python/stock_dashboard/docs/ENV.md) 참조)
 
 ## 3. 폴더 구조 (Folder Structure)
 ```text
 stock_dashboard/
 ├── docs/                   # 기획 및 아키텍처 문서
 │   ├── PRD.md
-│   └── ARCH.md
+│   ├── ARCH.md
+│   └── ENV.md              # 서버 환경 및 배포 가이드 (시스템 사양, venv 관리 등)
 ├── src/                    # 소스 코드 디렉토리
 │   ├── app.py              # Flask 메인 엔트리포인트 및 API 라우터
 │   ├── data_fetcher.py     # 외부 API/크롤링 기반 데이터 수집 모듈
 │   ├── us_sector_fetcher.py# 미국 시장 섹터 및 테마 시황 수집 로직
 │   ├── theme_analyzer.py   # 주도 테마 선정 및 데이터 가공 로직
 │   └── sector_mapping.json # 미국 주식 테마 매핑 설정 파일
+├── venv/                   # Python 가상환경 (Git 제외)
 ├── tests/                  # 테스트 디렉토리
 │   ├── test_data.py        # 데이터 수집 관련 단위 테스트
 │   └── test_theme.py       # 테마 분석 로직 관련 단위 테스트
 ├── data/                   # 로컬 데이터 캐시 저장 (필요시)
 ├── requirements.txt        # 의존성 패키지 목록
+├── run.sh                  # 자동 환경 체크 및 서버 실행 스크립트
+├── stop.sh                 # 서버 종료 스크립트
 └── .env                    # 환경 변수 (API 키, URL 설정 등)
 ```
 
