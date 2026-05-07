@@ -22,6 +22,12 @@ fi
 # 가상환경 활성화
 source venv/bin/activate
 
+# 가상환경이 정상적으로 활성화되었는지 확인
+if [ -z "$VIRTUAL_ENV" ]; then
+    echo "에러: 가상환경 활성화에 실패했습니다."
+    exit 1
+fi
+
 echo "의존성 패키지를 확인하고 설치합니다..."
 # 가상환경 내부의 pip를 사용하도록 보장
 pip install --upgrade pip
