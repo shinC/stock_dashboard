@@ -289,7 +289,9 @@ async function renderThemes() {
             if (stocks.length === 0) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td colspan="4" style="color:var(--text-secondary); text-align:center;">종목 데이터가 없습니다.</td>
+                    <td colspan="4" style="color:var(--text-secondary); text-align:center; padding: 2rem;">
+                        필터링 조건(등락률 10%↑ 또는 거래대금 1000억↑)에 부합하는 종목이 없습니다.
+                    </td>
                 `;
                 tbody.appendChild(tr);
             } else {

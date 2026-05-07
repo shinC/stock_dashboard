@@ -98,12 +98,8 @@ def get_leading_themes():
                             except ValueError:
                                 continue
                     
-                    # 1차 필터링: 등락률 3% 이상 또는 거래대금 100억 이상
-                    filtered_stocks = [s for s in all_theme_stocks if s['rate_val'] >= 3.0 or s['trade_amt_val'] >= 10000]
-                    
-                    # 만약 필터링된 종목이 없으면 상위 3개 종목 강제 노출 (주도 테마인데 종목이 없는 현상 방지)
-                    if not filtered_stocks and all_theme_stocks:
-                        filtered_stocks = sorted(all_theme_stocks, key=lambda x: x['rate_val'], reverse=True)[:3]
+                    # 1차 필터링: 등락률 10% 이상 또는 거래대금 1000억 이상
+                    filtered_stocks = [s for s in all_theme_stocks if s['rate_val'] >= 10.0 or s['trade_amt_val'] >= 100000]
                     
                     # 최종 출력 데이터에서 정렬용 필드 삭제 및 개수 제한
                     for s in filtered_stocks:
