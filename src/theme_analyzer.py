@@ -51,8 +51,8 @@ def get_leading_themes():
                     'theme_url': theme_url
                 })
                 
-        # 등락률 기준으로 내림차순 정렬하여 상위 5개 추출
-        themes = sorted(themes, key=lambda x: x['등락률(%)'], reverse=True)[:5]
+        # 등락률 기준으로 내림차순 정렬하여 상위 11개 추출
+        themes = sorted(themes, key=lambda x: x['등락률(%)'], reverse=True)[:11]
         
         # 각 테마별 종목 상세 정보 크롤링
         for theme in themes:
@@ -65,11 +65,8 @@ def get_leading_themes():
                 
                 t_tables = t_soup.find_all('table', {'class': 'type_5'})
                 if t_tables:
+                    all_theme_stocks = []
                     for tr in t_tables[0].find_all('tr'):
-                        # 최대 10개 종목까지만 수집
-                        if len(theme['stocks']) >= 10:
-                            break
-                            
                         t_cols = tr.find_all('td')
                         if len(t_cols) > 5:
                             # 종목명 추출
@@ -88,28 +85,39 @@ def get_leading_themes():
                                 rate_val = float(rate_str)
                                 trade_amt_val = int(trade_amount_str)
                                 
-                                # 조건: 등락률 10% 이상이거나 거래대금 천억(100,000백만) 이상만 포함
-                                if rate_val >= 10.0 or trade_amt_val >= 100000:
-                                    is_high_volume = trade_amt_val >= 100000
-                                    
-                                    theme['stocks'].append({
-                                        '종목명': stock_name,
-                                        '현재가': price,
-                                        '등락률': t_cols[4].text.strip(),
-                                        '거래대금': t_cols[8].text.strip(),
-                                        'is_high_volume': is_high_volume
-                                    })
-                                    
-                                    # 상위 7개 종목까지만 수집
-                                    if len(theme['stocks']) >= 7:
-                                        break
+                                stock_data = {
+                                    '종목명': stock_name,
+                                    '현재가': price,
+                                    '등락률': t_cols[4].text.strip(),
+                                    '거래대금': t_cols[8].text.strip(),
+                                    'is_high_volume': trade_amt_val >= 100000,
+                                    'rate_val': rate_val,
+                                    'trade_amt_val': trade_amt_val
+                                }
+                                all_theme_stocks.append(stock_data)
                             except ValueError:
                                 continue
+                    
+                    # 1차 필터링: 등락률 3% 이상 또는 거래대금 100억 이상
+                    filtered_stocks = [s for s in all_theme_stocks if s['rate_val'] >= 3.0 or s['trade_amt_val'] >= 10000]
+                    
+                    # 만약 필터링된 종목이 없으면 상위 3개 종목 강제 노출 (주도 테마인데 종목이 없는 현상 방지)
+                    if not filtered_stocks and all_theme_stocks:
+                        filtered_stocks = sorted(all_theme_stocks, key=lambda x: x['rate_val'], reverse=True)[:3]
+                    
+                    # 최종 출력 데이터에서 정렬용 필드 삭제 및 개수 제한
+                    for s in filtered_stocks:
+                        del s['rate_val']
+                        del s['trade_amt_val']
+                    
+                    theme['stocks'] = filtered_stocks[:7]
+
             except Exception as e:
                 print(f"Error scraping theme details for {theme['테마명']}: {e}")
                 
             # URL 정보는 프론트에 필요 없으므로 삭제
-            del theme['theme_url']
+            if 'theme_url' in theme:
+                del theme['theme_url']
             
         return themes
         
