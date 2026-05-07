@@ -1,4 +1,4 @@
-#!/Users/taeheonshin/dev/python/stock_dashboard/venv/bin/python3.11
+#!/Users/taeheonshin/dev/python/stock_dashboard/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
