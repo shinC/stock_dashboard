@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  # 1. 파이썬 백엔드 앱 서비스
+  app:
+    build: .
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+    # 내부적으로 8080 포트를 사용하지만 외부로 노출하지 않고 Nginx를 통해서만 접근
+    expose:
+      - "8080"
+    volumes:
+      - ./src:/app/src
+      - ./frontend:/app/frontend
+
+  # 2. Nginx 웹 서버 서비스
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "80:80" # 외부 80 포트를 Nginx 컨테이너 80 포트로 매핑
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app # 파이썬 앱이 먼저 실행된 후 Nginx 실행

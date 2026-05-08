@@ -40,6 +40,14 @@
 ---
 
 ## 4. 배포 프로세스 (CI/CD)
+
+### 방식 A: 도커 배포 (권장 - Recommended)
+1. 로컬에서 작업 완료 후 `git push origin main`.
+2. 운영 서버에서 `git pull origin main`.
+3. `docker-compose up -d --build` 실행.
+   - 도커가 이미지 빌드, 패키지 설치, 컨테이너 교체를 자동으로 수행.
+
+### 방식 B: 수동 배포 (기존 방식)
 1. 로컬에서 작업 완료 후 `git push origin main`.
 2. 운영 서버에 접속하여 `git pull --rebase`.
 3. `sudo systemctl restart stock`으로 서버 재시작.
@@ -47,8 +55,15 @@
 
 ---
 
-## 5. 환경 파악 명령어 (Troubleshooting)
+## 5. 관련 문서
+- [DOCKER.md](file:///Users/taeheonshin/dev/python/stock_dashboard/docs/DOCKER.md): 도커 환경 구성 및 상세 명령어 가이드.
+- [ARCH.md](file:///Users/taeheonshin/dev/python/stock_dashboard/docs/ARCH.md): 시스템 전체 구조 및 로직 설명.
+
+---
+
+## 6. 환경 파악 명령어 (Troubleshooting)
 문제가 발생할 경우 다음 명령어로 환경을 재확인하십시오.
+- **도커 로그 확인**: `docker-compose logs -f`
 - **포트 확인**: `lsof -i :8080` (내부), `lsof -i :80` (외부)
-- **서비스 상태**: `systemctl status stock`
+- **서비스 상태**: `systemctl status stock` (수동 배포 시)
 - **Nginx 설정 검사**: `nginx -t`
