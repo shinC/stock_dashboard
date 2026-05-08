@@ -1,38 +1,54 @@
 # Server Environment & Deployment Guide
 
-이 문서는 프로젝트의 실행 환경과 배포 시 고려해야 할 기술적 세부 사항을 기록합니다. AI 에이전트가 환경을 오해하지 않도록 최신 상태를 유지하십시오.
+이 문서는 프로젝트의 실행 환경(로컬 및 운영 서버)과 배포 시 고려해야 할 기술적 세부 사항을 기록합니다.
 
-## 1. 시스템 정보 (Current)
-- **OS**: macOS (Darwin)
-- **Architecture**: arm64 (Apple Silicon)
-- **Default Python**: `/usr/bin/python3` (v3.9.6)
-- **Project Path**: `/Users/taeheonshin/dev/python/stock_dashboard`
+---
 
-## 2. 가상환경 (venv) 구성
-- **경로**: `{ProjectRoot}/venv`
-- **상태**: Python 3.9 기반으로 구성됨.
-- **주의사항**: 이 시스템은 PEP 668(externally-managed-environment)이 적용되어 있어, **반드시 venv 내부의 pip를 사용**해야 합니다. 시스템 전역 pip 사용 시 에러가 발생합니다.
-- **복구 로직**: `run.sh`에 인터프리터 유효성 검사 로직이 포함되어 있어, 파이썬 업데이트 등으로 `venv`가 깨질 경우 자동으로 재생성합니다.
+## 1. 로컬 개발 환경 (Local Environment)
+- **OS**: macOS (Darwin, Apple Silicon)
+- **Python**: `/usr/bin/python3` (v3.9.6)
+- **가상환경**: `{ProjectRoot}/venv` (Python 3.9 기반)
+- **실행 방식**: `./run.sh`를 통한 백그라운드 실행 (`nohup python src/app.py`)
+- **접속**: `http://localhost:8080`
+- **특이사항**: PEP 668 적용 환경으로, 반드시 venv 내부의 pip/python을 사용해야 함.
 
-## 3. 네트워크 및 포트
-- **Backend Port**: `8080` (Flask)
-- **Frontend**: `../frontend` 디렉토리를 Flask의 정적 파일로 서빙
-- **Access URL**: `http://localhost:8080` (또는 설정된 도메인)
+---
 
-## 4. 주요 실행 스크립트
-- **`./run.sh`**: 가상환경 확인 -> 의존성 설치 -> 백그라운드 실행 (`nohup`)
-- **`./stop.sh`**: PID 파일을 찾아 서버 종료
+## 2. 운영 서버 환경 (Production - Oracle Cloud)
+- **OS**: Ubuntu 22.04 LTS
+- **IP**: `168.107.13.219`
+- **프로젝트 경로**: `/home/ubuntu/stock_dashboard`
+- **서버 구성 (Infrastructure)**:
+  - **Web Server (Nginx)**: 80 포트 리버스 프록시 역할. 보안 및 정적 파일 처리 보조.
+  - **WAS (Gunicorn)**: 파이썬 앱을 실행하는 실제 엔진.
+    - **Worker**: `gevent` 워커 사용 (실시간 데이터 및 비동기 처리에 최적화)
+    - **Port**: 내부 8080 포트 사용
+  - **Process Manager**: `systemd` (`stock.service`)를 통해 서버 부팅 시 자동 실행 및 장애 시 자동 재시작.
 
-## 5. 배포 및 업데이트 절차
-1. **코드 업데이트**: `git pull --rebase origin main` (이력 충돌 방지)
-2. **서버 재실행**: `./run.sh` 실행 (스크립트 내부에서 venv 및 패키지 체크 자동 수행)
-3. **로그 확인**: `tail -f server.log`
+---
 
-## 6. 환경 파악 명령어 (Troubleshooting)
+## 3. 주요 스크립트 및 서비스 관리
+- **로컬 전용**:
+  - `./run.sh`: 가상환경 체크 및 백그라운드 실행.
+  - `./stop.sh`: 로컬 프로세스 종료.
+- **운영 서버 전용**:
+  - `sudo systemctl restart stock`: Gunicorn 서버 재시작.
+  - `sudo systemctl restart nginx`: Nginx 설정 변경 시 재시작.
+  - `tail -f /var/log/nginx/error.log`: Nginx 에러 로그 확인.
+  - `journalctl -u stock -f`: Gunicorn(App) 실시간 로그 확인.
+
+---
+
+## 4. 배포 프로세스 (CI/CD)
+1. 로컬에서 작업 완료 후 `git push origin main`.
+2. 운영 서버에 접속하여 `git pull --rebase`.
+3. `sudo systemctl restart stock`으로 서버 재시작.
+   - (의존성 변경 시 `venv` 내 패키지 재설치 필요)
+
+---
+
+## 5. 환경 파악 명령어 (Troubleshooting)
 문제가 발생할 경우 다음 명령어로 환경을 재확인하십시오.
-```bash
-which python3 && python3 --version
-./venv/bin/python --version
-pip --version (venv 활성화 상태에서)
-lsof -i :8080
-```
+- **포트 확인**: `lsof -i :8080` (내부), `lsof -i :80` (외부)
+- **서비스 상태**: `systemctl status stock`
+- **Nginx 설정 검사**: `nginx -t`
