@@ -33,16 +33,11 @@ class KiwoomAPI:
             res = requests.post(url, json=data, timeout=5)
             if res.status_code == 200:
                 result = res.json()
-                # 가이드에 따르면 필드명이 'token'임
-                self.access_token = result.get("token")
-                if not self.access_token:
-                    # 혹시 몰라 'access_token'도 확인
-                    self.access_token = result.get("access_token")
+                self.access_token = result.get("token") or result.get("access_token")
                 
                 if not self.access_token:
                     return None
                 
-                # expires_in은 보통 초 단위
                 expires_in = int(result.get("expires_in", 86400))
                 self.token_expiry = time.time() + expires_in - 60
                 return self.access_token
@@ -78,10 +73,9 @@ class KiwoomAPI:
             res = requests.post(url, headers=headers, json=body, timeout=5)
             if res.status_code == 200:
                 data = res.json()
-                # 응답에서 'output' 필드 추출
-                return data.get("output")
+                # 'output' 필드가 있으면 해당 필드를, 없으면 전체를 반환
+                return data.get("output") or data
             else:
-                # 404 등이 나면 범용 엔드포인트 /v1/request로 fallback
                 return self._fallback_request_tr(tr_id, input_data)
         except Exception as e:
             return self._fallback_request_tr(tr_id, input_data)
@@ -89,6 +83,10 @@ class KiwoomAPI:
     def _fallback_request_tr(self, tr_id, input_data):
         """범용 엔드포인트 /v1/request 시도"""
         token = self.get_access_token()
+        if not token:
+            print("Fallback skipped: No token")
+            return None
+            
         url = f"{self.base_url}/v1/request"
         headers = {
             "Content-Type": "application/json;charset=UTF-8",
@@ -102,9 +100,11 @@ class KiwoomAPI:
         try:
             res = requests.post(url, headers=headers, json=body, timeout=5)
             if res.status_code == 200:
-                return res.json().get("output")
-            return None
-        except:
+                data = res.json()
+                return data.get("output") or data
+            else:
+                return None
+        except Exception as e:
             return None
 
 if __name__ == "__main__":
