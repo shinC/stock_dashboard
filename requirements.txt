@@ -12,3 +12,4 @@ finance-datareader
 gunicorn
 gevent
 APScheduler
+pykrx

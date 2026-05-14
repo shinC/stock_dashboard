@@ -14,6 +14,17 @@ if [ -f server.pid ]; then
 fi
 
 # 추가적으로 8080 포트를 점유 중인 프로세스 강제 종료
-fuser -k 8080/tcp 2>/dev/null
+if command -v fuser >/dev/null 2>&1; then
+    fuser -k 8080/tcp 2>/dev/null
+fi
+
+# lsof를 이용한 추가 확인 및 종료 (fuser가 실패하거나 없는 경우 대비)
+if command -v lsof >/dev/null 2>&1; then
+    PIDS=$(lsof -t -i:8080)
+    if [ ! -z "$PIDS" ]; then
+        echo "8080 포트를 점유 중인 프로세스($PIDS)를 종료합니다..."
+        kill -9 $PIDS 2>/dev/null
+    fi
+fi
 
 echo "서버 종료 처리가 완료되었습니다."

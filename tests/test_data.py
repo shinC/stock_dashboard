@@ -23,9 +23,10 @@ class TestDataFetcher(unittest.TestCase):
 
     def test_get_leading_themes(self):
         themes = get_leading_themes()
-        self.assertIsNotNone(themes, "Themes dataframe should not be None")
-        self.assertFalse(themes.empty, "Themes dataframe is empty")
-        self.assertIn('테마명', themes.columns)
+        self.assertIsNotNone(themes, "Themes list should not be None")
+        self.assertIsInstance(themes, list, "Themes should be a list")
+        self.assertGreater(len(themes), 0, "Themes list is empty")
+        self.assertIn('테마명', themes[0])
 
     def test_get_us_top_stocks(self):
         data = get_us_top_stocks(exchange='NASDAQ', sort_type='up')
