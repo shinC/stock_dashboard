@@ -9,11 +9,6 @@ else
 fi
 
 echo "가상환경(venv)을 확인합니다..."
-<<<<<<< HEAD
-# venv 디렉토리가 없거나 인터프리터가 깨져있으면(Bad interpreter) 새로 생성
-if [ ! -d "venv" ] || ! ./venv/bin/python --version > /dev/null 2>&1; then
-    echo "venv가 없거나 인터프리터가 깨져 있어 새로 생성합니다 (python3 -m venv venv)..."
-=======
 # venv 디렉토리가 없거나 python 바이너리가 유효하지 않으면 재생성
 RECREATE_VENV=false
 if [ ! -d "venv" ]; then
@@ -30,7 +25,6 @@ fi
 
 if [ "$RECREATE_VENV" = true ]; then
     echo "venv가 없거나 손상되어 새로 생성합니다..."
->>>>>>> 546e668 (주도테마에서 거래대금 가져오는 부붐 키움API로 수정)
     rm -rf venv
     python3 -m venv venv
     if [ $? -ne 0 ]; then
