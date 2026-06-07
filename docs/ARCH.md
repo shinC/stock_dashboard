@@ -55,3 +55,19 @@ stock_dashboard/
   3. **상승 종목 수:** 테마 내에서 상승 마감(또는 상승 중)인 종목의 개수 및 비율.
 - **산출 방식:** 위 세 가지 지표를 표준화하여 종합 점수(Composite Score)를 매기고, 상위 N개의 테마를 선정.
 - **출력 포맷:** DataFrame 형태로 가공되어 UI 테이블에 바인딩.
+
+## 6. Docker 통합 배포 아키텍처 및 설정 상세 (6/07 추가)
+
+### 6.1 컨테이너 구성 및 네트워크
+- **Nginx 컨테이너**: 외부 요청(포트 80)을 수신하여 내부 서비스 네트워크 상의 `app:8080` 포트로 트래픽을 프록싱합니다.
+- **App 컨테이너 (WAS)**: `python:3.9-slim` 기반 이미지로 동작하며, Gunicorn(gevent 워커) 엔진을 사용해 포트 8080에서 Flask 애플리케이션을 구동합니다.
+- **네트워크 구조**: 두 컨테이너는 Docker Compose가 자동으로 생성하는 단일 내부 가상 네트워크(Bridge)를 통해 통신하며, 호스트에는 Nginx 컨테이너의 80 포트만 노출됩니다.
+
+### 6.2 안정성 확보를 위한 주요 아키텍처적 결정
+1. **Gunicorn 워커 부팅 타임아웃 방지**:
+   - 백엔드 앱 시작 시 지표 및 차트 데이터 수집(약 20~30초 소요) 중 Gunicorn 마스터 프로세스가 워커의 미응답을 감지하여 강제 재시작하는 것을 방지하기 위해 Gunicorn 기동 인자에 `--timeout 120`을 부여합니다.
+2. **환경 변수(.env) 접근 경로 보정**:
+   - Gunicorn 구동 위치가 `--chdir src` 옵션으로 인해 `/app/src`로 바뀌더라도 프로젝트 루트 디렉토리 `/app` 혹은 `/app/src` 하위에서 `.env` 파일을 올바르게 읽을 수 있도록 Docker Compose 환경 파일(`env_file`) 매핑과 볼륨 마운트를 상호 보완적으로 구성합니다.
+3. **SSE(Server-Sent Events) 스트리밍 프록시 설정**:
+   - `nginx/default.conf` 내에 SSE 연결 상태가 끊어지지 않도록 `proxy_buffering off`, `proxy_cache off`, `chunked_transfer_encoding off` 등의 버퍼 차단 설정을 명확히 하고, 연결 지속을 위한 `proxy_read_timeout` 및 `keepalive_timeout` 설정을 최적화합니다.
+

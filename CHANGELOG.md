@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.2.2] - 2026-06-07
+
+### Added
+- **Docker Compose 기반 Nginx + WAS 완전 통합 배포 도입**:
+  - 기존에 호스트에 설치된 Nginx와 도커 WAS의 이원화 구조를 개선하여, 두 서비스를 모두 독립 컨테이너화하고 Docker Bridge 네트워크로 조립.
+  - `.env` 환경 변수 파일의 Gunicorn 내부 경로 바인딩 및 볼륨 매핑 추가.
+- **로컬 Docker Compose 지원**:
+  - `run.sh` 및 `stop.sh`에 도커 기반 구동 로직을 기본값으로 채택하여 로컬 개발 환경과 실제 배포 환경을 100% 동기화.
+  - 기존 로컬 venv 실행 기능은 `--local` 플래그로 보존 및 하위 호환성 유지.
+
+### Fixed
+- **Gunicorn 워커 부팅 타임아웃 방지**:
+  - `Dockerfile`의 Gunicorn 기동 명령에 `--timeout 120` 인자를 적용하여, 초기 데이터 캐싱 지연 시 워커 프로세스가 비동기적으로 강제 종료되는 무한 루프 오류 해결.
+- **Nginx SSE 스트리밍 연결 수명 연장**:
+  - `nginx/default.conf` 설정 내 `proxy_read_timeout 86400s` 및 `proxy_send_timeout`을 튜닝하여, 실시간 SSE 연결 스트림이 정기 끊김 현상 없이 안정적으로 유지되도록 보완.
+- **배포 프로세스 오류 방지**:
+  - `deploy.sh` 개편을 통해 외부 80 포트 바인딩 충돌을 예방하도록 호스트의 기존 Nginx 서비스 및 stock 서비스를 자동 중단/비활성화 처리하는 로직 추가.
+
 ## [1.2.1] - 2026-05-14
 
 ### Fixed

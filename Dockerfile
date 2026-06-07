@@ -21,5 +21,5 @@ COPY frontend/ ./frontend/
 # 6. 환경변수 설정 (파이썬 로그 출력 실시간 확인용)
 ENV PYTHONUNBUFFERED=1
 
-# 7. Gunicorn 실행 (gevent 워커 사용, 8080 포트 바인딩)
-CMD ["gunicorn", "--workers", "1", "--worker-class", "gevent", "--bind", "0.0.0.0:8080", "--chdir", "src", "app:app"]
+# 7. Gunicorn 실행 (gevent 워커 사용, 8080 포트 바인딩, 초기 수집을 위해 타임아웃 120초 설정)
+CMD ["gunicorn", "--workers", "1", "--worker-class", "gevent", "--bind", "0.0.0.0:8080", "--timeout", "120", "--chdir", "src", "app:app"]
