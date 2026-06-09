@@ -1,5 +1,5 @@
 # 1. 베이스 이미지 설정 (경량화된 파이썬 3.9 이미지 사용)
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 # 2. 작업 디렉토리 설정
 WORKDIR /app
