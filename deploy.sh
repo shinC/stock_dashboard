@@ -78,16 +78,16 @@ if [ ! -f ".env" ]; then
     sudo -u $APP_USER touch .env
 fi
 
-echo "도커 컨테이너 빌드 및 시작..."
-$DOCKER_COMPOSE_CMD down
-$DOCKER_COMPOSE_CMD up -d --build
+echo "도커 컨테이너 빌드 및 시작 (운영 HTTPS 모드)..."
+./stop.sh --prod
+./run.sh --prod
 
 echo "[5/5] 최종 배포 상태 검증"
 sleep 5
-$DOCKER_COMPOSE_CMD ps
+docker compose -f docker-compose.prod.yml ps
 
 echo "========================================================="
 echo " 배포가 성공적으로 완료되었습니다!"
-echo " 이제 브라우저에서 서버 IP(예: http://168.107.13.219 )로 접속하세요."
-echo " 로그 확인: cd $REPO_DIR && sudo docker compose logs -f"
+echo " 이제 브라우저에서 서버 도메인(https://stock.tripods.kr/)으로 접속하세요."
+echo " 로그 확인: cd $REPO_DIR && sudo docker compose -f docker-compose.prod.yml logs -f"
 echo "========================================================="
