@@ -9,9 +9,19 @@ from us_sector_fetcher import get_us_sectors_data
 import pandas as pd
 import os
 import json
+import math
 import requests
 import gevent
 from gevent.queue import Queue
+
+def sanitize_nan(obj):
+    if isinstance(obj, float):
+        return None if math.isnan(obj) else obj
+    elif isinstance(obj, dict):
+        return {k: sanitize_nan(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [sanitize_nan(v) for v in obj]
+    return obj
 
 app = Flask(__name__, static_folder='../frontend', static_url_path='/')
 # 프론트엔드와 백엔드가 다른 포트에서 실행될 수 있으므로 CORS 허용
@@ -118,7 +128,7 @@ def background_fetch_loop():
                 market_data_cache['us'] = us_data
                 market_data_cache['kr'] = kr_data
                 
-                payload = json.dumps({"us": us_data, "kr": kr_data})
+                payload = json.dumps(sanitize_nan({"us": us_data, "kr": kr_data}))
                 # 브로드캐스트
                 for q in clients:
                     q.put(payload)
@@ -139,7 +149,7 @@ def stream_events():
         # 5/6 보완: 연결 즉시 "연결됨" 신호와 현재 캐시된 데이터가 있다면 즉시 전송
         # Nginx 버퍼링을 밀어내기 위해 초기 데이터를 확실히 보냄
         initial_data = {"type": "connected", "us": market_data_cache.get('us'), "kr": market_data_cache.get('kr')}
-        yield f"data: {json.dumps(initial_data)}\n\n"
+        yield f"data: {json.dumps(sanitize_nan(initial_data))}\n\n"
             
         while True:
             # 새로운 데이터가 들어올 때까지 대기

@@ -170,9 +170,9 @@ def get_daily_summary(name: str):
             if df.index.tz is not None:
                 max_final_ts = max_final_ts.tz_localize(df.index.tz)
                 
-            df_filtered = df[df.index <= max_final_ts]
+            df_filtered = df[df.index <= max_final_ts].dropna(subset=['Close', 'Open'])
             if len(df_filtered) < 2:
-                df_filtered = df  # fallback
+                df_filtered = df.dropna(subset=['Close', 'Open'])  # fallback
                 
             current_close = float(df_filtered['Close'].iloc[-1])
             current_open = float(df_filtered['Open'].iloc[-1])
@@ -195,9 +195,9 @@ def get_daily_summary(name: str):
             if df.index.tz is not None:
                 max_final_ts = max_final_ts.tz_localize(df.index.tz)
                 
-            df_filtered = df[df.index <= max_final_ts]
+            df_filtered = df[df.index <= max_final_ts].dropna(subset=[close_col, open_col])
             if len(df_filtered) < 2:
-                df_filtered = df  # fallback
+                df_filtered = df.dropna(subset=[close_col, open_col])  # fallback
                 
             current_close = float(df_filtered[close_col].iloc[-1])
             current_open = float(df_filtered[open_col].iloc[-1])

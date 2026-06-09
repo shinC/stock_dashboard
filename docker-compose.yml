@@ -9,6 +9,7 @@ services:
       - .env
     environment:
       - PYTHONUNBUFFERED=1
+      - TZ=Asia/Seoul
     # 내부적으로 8080 포트를 사용하지만 외부로 노출하지 않고 Nginx를 통해서만 접근
     expose:
       - "8080"

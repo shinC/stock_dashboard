@@ -1,5 +1,5 @@
 # 1. 베이스 이미지 설정 (경량화된 파이썬 3.9 이미지 사용)
-FROM python:3.9-slim
+FROM python:3.12-slim
 
 # 2. 작업 디렉토리 설정
 WORKDIR /app
@@ -7,6 +7,9 @@ WORKDIR /app
 # 3. 시스템 의존성 설치 (gevent 빌드 등에 필요한 도구들)
 RUN apt-get update && apt-get install -y \
     build-essential \
+    tzdata \
+    && cp /usr/share/zoneinfo/Asia/Seoul /etc/localtime \
+    && echo "Asia/Seoul" > /etc/timezone \
     && rm -rf /var/lib/apt/lists/*
 
 # 4. 의존성 파일 복사 및 설치 (캐싱 효율을 위해 먼저 수행)
