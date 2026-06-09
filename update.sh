@@ -5,7 +5,7 @@ echo "GitHub에서 최신 코드를 가져옵니다..."
 git pull origin main
 
 echo "통합 도커 환경(Nginx+WAS)을 재빌드하고 재시작합니다..."
-./stop.sh --prod
-./run.sh --prod
+sudo ./stop.sh --prod
+sudo ./run.sh --prod
 
 echo "업데이트가 완료되었습니다!"
