@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # 1. 파이썬 백엔드 앱 서비스
+  app:
+    build: .
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TZ=Asia/Seoul
+    # 내부적으로 8080 포트를 사용하지만 외부로 노출하지 않고 Nginx를 통해서만 접근
+    expose:
+      - "8080"
+    volumes:
+      - ./src:/app/src
+      - ./frontend:/app/frontend
+      - ./.env:/app/.env
+
+  # 2. Nginx 웹 서버 서비스 (운영 환경 HTTPS용)
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "80:80"   # HTTP 리다이렉트용
+      - "443:443" # HTTPS 서비스용
+    volumes:
+      - ./nginx/prod.conf:/etc/nginx/conf.d/default.conf
+      # 운영 서버(호스트)의 인증서 파일들을 컨테이너 내부로 읽기 전용(ro) 매핑
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - app # 파이썬 앱이 먼저 실행된 후 Nginx 실행

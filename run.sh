@@ -3,9 +3,12 @@
 
 # 인자값 파싱
 RUN_LOCAL=false
+RUN_PROD=false
 for arg in "$@"; do
     if [ "$arg" = "--local" ]; then
         RUN_LOCAL=true
+    elif [ "$arg" = "--prod" ]; then
+        RUN_PROD=true
     fi
 done
 
@@ -121,12 +124,18 @@ else
         fi
     fi
 
+    COMPOSE_FILE_ARG=""
+    if [ "$RUN_PROD" = true ]; then
+        echo " [운영 모드] docker-compose.prod.yml을 사용합니다 (HTTPS 적용)"
+        COMPOSE_FILE_ARG="-f docker-compose.prod.yml"
+    fi
+
     echo "도커 컴포즈 빌드 및 백그라운드 실행..."
-    $DOCKER_COMPOSE_CMD up -d --build
+    $DOCKER_COMPOSE_CMD $COMPOSE_FILE_ARG up -d --build
 
     echo "컨테이너 상태 확인..."
     sleep 3
-    $DOCKER_COMPOSE_CMD ps
+    $DOCKER_COMPOSE_CMD $COMPOSE_FILE_ARG ps
 
     echo "------------------------------------------------"
     echo "도커 기반 서버 기동이 성공적으로 호출되었습니다!"

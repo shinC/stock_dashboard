@@ -3,9 +3,12 @@
 
 # 인자값 파싱
 STOP_LOCAL=false
+STOP_PROD=false
 for arg in "$@"; do
     if [ "$arg" = "--local" ]; then
         STOP_LOCAL=true
+    elif [ "$arg" = "--prod" ]; then
+        STOP_PROD=true
     fi
 done
 
@@ -58,8 +61,14 @@ else
         fi
     fi
 
+    COMPOSE_FILE_ARG=""
+    if [ "$STOP_PROD" = true ]; then
+        echo " [운영 모드] docker-compose.prod.yml 컨테이너 환경을 종료합니다."
+        COMPOSE_FILE_ARG="-f docker-compose.prod.yml"
+    fi
+
     echo "도커 컨테이너를 정지하고 네트워크를 제거합니다..."
-    $DOCKER_COMPOSE_CMD down
+    $DOCKER_COMPOSE_CMD $COMPOSE_FILE_ARG down
 
     echo "컨테이너 종료 처리가 완료되었습니다."
 fi
