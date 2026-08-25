@@ -72,3 +72,37 @@ docker-compose logs -f app
 ```bash
 docker-compose down
 ```
+
+---
+
+## 6. SSL 인증서 관리 및 자동 갱신
+
+본 프로젝트는 HTTPS 보안 연결을 위해 Let's Encrypt인증서를 활용하고 있으며, 90일마다 만료되므로 주기적인 갱신이 필요합니다.
+
+### 6.1 수동 인증서 갱신 절차
+1. 80번 포트를 점유하고 있는 도커 컨테이너를 정지합니다.
+   ```bash
+   sudo ./stop.sh --prod
+   ```
+2. `certbot` 명령어로 인증서를 갱신합니다.
+   ```bash
+   sudo certbot renew
+   ```
+3. 도커 서비스를 다시 가동합니다.
+   ```bash
+   sudo ./run.sh --prod
+   ```
+4. 갱신 성공 후, Nginx에 새 인증서 설정을 리로드합니다.
+   ```bash
+   docker compose -f docker-compose.prod.yml exec nginx nginx -s reload
+   ```
+
+### 6.2 크론탭(Crontab)을 통한 자동 갱신 설정
+매번 만료 직전에 수동으로 갱신하는 번거로움을 해결하기 위해, 호스트 OS의 `root` 권한 크론탭(`sudo crontab -e`)에 다음과 같은 자동화 스케줄을 등록했습니다.
+
+* **등록된 크론 스케줄**:
+  ```text
+  0 3 * * * certbot renew --pre-hook "/home/ubuntu/stock_dashboard/stop.sh --prod" --post-hook "/home/ubuntu/stock_dashboard/run.sh --prod" --quiet
+  ```
+* **작동 설명**: 매일 새벽 3시에 갱신 검사를 수행하며, 실제 인증서 갱신이 필요할 때에만 자동으로 도커 서비스를 중지(`stop.sh`)하고 갱신 후 재시작(`run.sh`)을 안전하게 수행합니다.
+

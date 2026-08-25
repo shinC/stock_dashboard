@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.2.3] - 2026-08-25
+
+### Added
+- **SSL 자동 갱신 크론탭 설정 이력 보존**:
+  - 호스트 OS 크론탭(`sudo crontab -e`)에 `certbot renew` 스케줄러 등록 완료. 갱신 성공 시 도커 컨테이너 중지/기동 훅 연계.
+  - 관련 배포 및 유지보수 가이드라인 문서([docs/deploy_guide.md](file:///workspaces/stock/docs/deploy_guide.md)) 최신화.
+
+### Fixed
+- **Nginx HTTP -> HTTPS 리다이렉트 타겟 고정**:
+  - [nginx/prod.conf](file:///workspaces/stock/nginx/prod.conf) 내 리다이렉션 대상 URL을 `$host`에서 `stock.tripods.kr`로 명시적 하드코딩 변경. IP 주소 등으로 접속했을 때 도메인 불일치에 의한 비공개 연결 경고가 발생하는 사이드 이펙트 예방.
+
 ## [1.2.2] - 2026-06-07
 
 ### Added
